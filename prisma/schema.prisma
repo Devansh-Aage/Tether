@@ -1,0 +1,173 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  PASSWORD
+  GOOGLE
+}
+
+model User {
+  id String @id @default(uuid()) @db.Uuid
+  email String @unique
+  username String 
+  profileImg String?
+  password String?
+  pubKey String?
+  googleId String?  //unique id given by google to each email
+  authProvider AuthProvider
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tasks Task[]  // One-to-Many: User has many Tasks
+  milestones Milestone[]  // One-to-Many: User has many Milestones
+  
+  messageSender Message[] @relation("MessageSender")
+  messageReceiver Message[] @relation("MessageReceiver")
+
+  callSender CallLog[] @relation("CallSender")
+  callReceiver CallLog[] @relation("CallReceiver")
+
+  // Many-to-Many: User is a member of many groups
+  // This implicitly creates a join table (e.g., _GroupToUser) managed by Prisma.
+  // The field name 'memberOfGroups' is more descriptive than just 'groups' here.
+  memberOfGroups Group[] @relation("GroupMembers")
+
+  // One-to-Many: User can be the admin of many groups
+  // We need a specific name for this relation because there are two relations
+  // between User and Group (adminship and membership).
+  adminOfGroups Group[] @relation("GroupAdmin") 
+
+  winnerOfContest Contest[] @relation("ContestWinner") //One to many
+  membersOfContest Contest[] @relation("ContestMembers")
+
+   // A user can be the "requestor" in many friendships
+  friendshipsInitiated Friendship[] @relation("UserFriendA")
+  // A user can be the "recipient" in many friendships
+  friendshipsReceived  Friendship[] @relation("UserFriendB")
+}
+
+model Task{
+  id String @id @default(uuid()) @db.Uuid
+  title String
+  isDone Boolean @default(false)
+  userId String @db.Uuid
+  owner User @relation(fields: [userId],references: [id],onDelete: Cascade)
+}
+
+model Milestone{
+  id String @id @default(uuid()) @db.Uuid
+  title String
+  description String
+  isDone Boolean @default(false)
+  deadline DateTime
+  userId String @db.Uuid
+  owner User @relation(fields: [userId],references: [id],onDelete: Cascade)
+}
+
+model FriendReq{
+  id String @id @default(uuid()) @db.Uuid
+  senderId String @db.Uuid
+  receiverId String @db.Uuid
+  sentAt DateTime @default(now())
+}
+
+model Group{
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  groupImg String?
+  adminId String @db.Uuid
+  members User[] @relation("GroupMembers")
+  admin User @relation("GroupAdmin",fields: [adminId], references: [id], onDelete: Cascade)
+
+  contest Contest[] //One to Many
+}
+
+model Contest{
+  id String @id @default(uuid()) @db.Uuid
+  title String
+  description String
+  startTime DateTime
+  endTime DateTime
+  totalStakeAmount Int @default(0)
+  winnerId String? @db.Uuid //foreign key
+  groupId String @db.Uuid //foreign key
+  
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade) //virtual table
+
+  winner User? @relation("ContestWinner",fields: [winnerId], references: [id], onDelete: Cascade)
+
+  contestMembers User[] @relation("ContestMembers")
+}
+
+model Message{
+  id String @id @default(uuid()) @db.Uuid
+  senderId String @db.Uuid
+  receiverId String @db.Uuid
+  text String?
+  media String?
+  timestamp DateTime @default(now())
+  chatId String @db.Uuid
+
+  chat Chat @relation(fields: [chatId],references: [id],onDelete: Cascade)
+
+  sender User @relation("MessageSender",fields: [senderId],references: [id],onDelete: Cascade)
+
+  receiver User @relation("MessageReceiver",fields: [receiverId],references: [id],onDelete: Cascade)
+}
+
+model Chat{
+  id String @id @default(uuid()) @db.Uuid
+  messages Message[]
+}
+
+model CallLog{
+  id String @id @default(uuid()) @db.Uuid
+  wasConnected Boolean @default(false)
+  duration Int?
+  timestamp DateTime @default(now())
+  callerId String @db.Uuid
+  receiverId String @db.Uuid
+
+  caller User @relation("CallSender",fields: [callerId],references: [id],onDelete: Cascade)
+
+  receiver User @relation("CallReceiver",fields: [receiverId],references: [id],onDelete: Cascade)
+}
+
+model Friendship {
+  id              String   @id @default(uuid()) @db.Uuid
+  userAId         String   @db.Uuid // ID of the first user in the friendship
+  userBId         String   @db.Uuid // ID of the second user in the friendship
+  establishedAt   DateTime @default(now()) // When the friendship was established
+
+  // Relations to User model
+  userA           User     @relation("UserFriendA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB           User     @relation("UserFriendB", fields: [userBId], references: [id], onDelete: Cascade)
+
+  //while adding of friends i have to store smaller user ID as user A
+
+  // Enforce uniqueness for the pair (to prevent duplicate friendships)
+  // And ensure order doesn't matter (e.g., (A,B) is same as (B,A))
+  // For simplicity, we can enforce (A,B) unique and always store A < B
+  // Or handle in application logic. For DB constraint, assuming userAId < userBId for canonical representation
+  @@unique([userAId, userBId])
+}
+
+model Session {
+  sid       String    @id @db.VarChar(255) // Session ID from the cookie
+  data      String    @db.Text // The actual session data (e.g., JSON string)
+  expiresAt DateTime  @map("expire") // Must be named 'expire' for connect-pg-simple
+  
+  @@map("sessions") // Maps to the 'sessions' table in PostgreSQL
+}
