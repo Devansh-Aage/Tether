@@ -6,8 +6,10 @@
   "scripts": {
     "start:http": "pnpm --filter http-server start",
     "start:ws": "pnpm --filter ws-server start",
+    "build:web": "pnpm --filter web build",
     "dev:http": "pnpm --filter http-server dev",
     "dev:ws": "pnpm --filter ws-server dev",
+    "dev:web":"pnpm --filter web dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -20,5 +22,8 @@
     "prisma": "^6.10.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0"
   }
 }

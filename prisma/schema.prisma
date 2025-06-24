@@ -23,12 +23,13 @@ model User {
   email String @unique
   username String 
   profileImg String?
-  password String?
+  password String? @db.VarChar(255)
   pubKey String?
   googleId String?  //unique id given by google to each email
   authProvider AuthProvider
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  googleRefreshToken String?
 
   tasks Task[]  // One-to-Many: User has many Tasks
   milestones Milestone[]  // One-to-Many: User has many Milestones
@@ -166,7 +167,7 @@ model Friendship {
 
 model Session {
   sid       String    @id @db.VarChar(255) // Session ID from the cookie
-  data      String    @db.Text // The actual session data (e.g., JSON string)
+  sess      String    @db.Text // The actual session data (e.g., JSON string)
   expiresAt DateTime  @map("expire") // Must be named 'expire' for connect-pg-simple
   
   @@map("sessions") // Maps to the 'sessions' table in PostgreSQL
