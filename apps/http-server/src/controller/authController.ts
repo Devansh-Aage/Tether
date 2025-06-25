@@ -100,6 +100,11 @@ export const login: RequestHandler = async (req, res) => {
       res.status(400).json({ message: "Invalid Email provided!" });
       return;
     }
+    const wrongAuthProvider = user.authProvider !== "PASSWORD";
+    if (wrongAuthProvider) {
+      res.status(400).json({ message: "Please login using Google" });
+      return;
+    }
 
     // Compare provided password with hashed password from the database
     const isPasswordMatch = await compare(password, user.password!);
@@ -247,11 +252,11 @@ export const googleCallback: RequestHandler = async (req, res) => {
 
 export const logout: RequestHandler = async (req, res) => {
   try {
-    console.log(req.session);
     req.session.destroy((err) => {
       if (err) {
         console.error("Session destruction error:", err);
-        return res.status(500).json({ message: "Logout failed" });
+        res.status(500).json({ message: "Logout failed" });
+        return;
       }
     });
 

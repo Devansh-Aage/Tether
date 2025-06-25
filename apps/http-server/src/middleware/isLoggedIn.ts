@@ -1,4 +1,7 @@
 import { RequestHandler } from "express";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 declare global {
   namespace Express {
@@ -11,7 +14,8 @@ declare global {
 export const isLoggedIn: RequestHandler = async (req, res, next) => {
   try {
     if (!req.session || !req.session.userId) {
-      res.redirect(`${process.env.FRONTEND_URL}/auth/login`);
+      res.status(401).json({ error: "Unauthorized" });
+      return;
     }
     req.userId = req.session.userId;
     next();

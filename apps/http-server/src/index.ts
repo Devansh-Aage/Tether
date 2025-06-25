@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import cors from "cors"; // For generating the state parameter
 import { Pool } from "pg"; // For connect-pg-simple
 import AuthRouter from "./routes/authRoutes";
+import TaskRouter from "./routes/taskRoutes";
+import MilestoneRouter from "./routes/milestoneRoutes";
 
 dotenv.config();
 
@@ -50,6 +52,8 @@ app.use(
 );
 
 app.use("/api/auth", AuthRouter);
+app.use("/api/task", TaskRouter);
+app.use("/api/milestone", MilestoneRouter);
 
 app.listen(process.env.HTTP_PORT, () => {
   console.log(`HTTP server listening on ${process.env.HTTP_PORT}`);
