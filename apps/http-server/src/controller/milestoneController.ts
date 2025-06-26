@@ -1,7 +1,10 @@
-import { addMilestone } from "@tether/common/src/zodSchemas";
+import { addMilestone } from "@tether/common/src/zodHttpSchemas";
 import { prisma } from "@tether/db/src";
 import { RequestHandler } from "express";
 import { z } from "zod";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const createMilestone: RequestHandler = async (req, res) => {
   try {

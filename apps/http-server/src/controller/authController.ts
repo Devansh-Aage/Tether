@@ -1,7 +1,7 @@
 import { genSalt, hash, compare } from "bcrypt";
 import { prisma } from "@tether/db/src/index";
 import { RequestHandler } from "express";
-import { loginUser, registerUser } from "@tether/common/src/zodSchemas";
+import { loginUser, registerUser } from "@tether/common/src/zodHttpSchemas";
 import { google } from "googleapis";
 import { randomBytes } from "node:crypto";
 import dotenv from "dotenv";

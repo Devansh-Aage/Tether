@@ -6,6 +6,7 @@ import { Pool } from "pg"; // For connect-pg-simple
 import AuthRouter from "./routes/authRoutes";
 import TaskRouter from "./routes/taskRoutes";
 import MilestoneRouter from "./routes/milestoneRoutes";
+import { socketIsLoggedIn } from "./middleware/socket-isLoggedIn";
 
 dotenv.config();
 
@@ -54,6 +55,8 @@ app.use(
 app.use("/api/auth", AuthRouter);
 app.use("/api/task", TaskRouter);
 app.use("/api/milestone", MilestoneRouter);
+
+app.get("/api/socket/auth", socketIsLoggedIn);
 
 app.listen(process.env.HTTP_PORT, () => {
   console.log(`HTTP server listening on ${process.env.HTTP_PORT}`);

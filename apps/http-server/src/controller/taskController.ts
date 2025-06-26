@@ -1,7 +1,10 @@
-import { addTask } from "@tether/common/src/zodSchemas";
+import { addTask } from "@tether/common/src/zodHttpSchemas";
 import { prisma } from "@tether/db/src";
 import { RequestHandler } from "express";
 import { z } from "zod";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const createTask: RequestHandler = async (req, res) => {
   try {
