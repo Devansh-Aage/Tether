@@ -1,8 +1,17 @@
 import { Socket } from "socket.io";
-import { sendFriendRequest } from "../controller/FriendReqController";
-import { ADD_FRIEND } from "@tether/common/src/eventConstants";
+import {
+  acceptFriendRequest,
+  denyFriendReq,
+  sendFriendRequest,
+} from "../controller/FriendReqController";
+import {
+  ACCEPT_FRIEND_REQ,
+  ADD_FRIEND,
+  DENY_FRIEND_REQ,
+} from "@tether/common/src/eventConstants";
 
-export const friendReqRoutes = (socket: Socket) => {
-  // Map events to handlers (like Express router)
+export const friendRoutes = (socket: Socket) => {
   socket.on(ADD_FRIEND, (data) => sendFriendRequest(socket, data));
+  socket.on(ACCEPT_FRIEND_REQ, (data) => acceptFriendRequest(socket, data));
+  socket.on(DENY_FRIEND_REQ, (data) => denyFriendReq(socket, data));
 };

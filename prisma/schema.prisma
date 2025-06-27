@@ -131,6 +131,9 @@ model Message{
 model Chat{
   id String @id @default(uuid()) @db.Uuid
   messages Message[]
+
+  friendshipId String @db.Uuid @unique
+  friendship  Friendship @relation(fields: [friendshipId],references: [id],onDelete: Cascade)
 }
 
 model CallLog{
@@ -151,6 +154,8 @@ model Friendship {
   userAId         String   @db.Uuid // ID of the first user in the friendship
   userBId         String   @db.Uuid // ID of the second user in the friendship
   establishedAt   DateTime @default(now()) // When the friendship was established
+
+  chat  Chat?
 
   // Relations to User model
   userA           User     @relation("UserFriendA", fields: [userAId], references: [id], onDelete: Cascade)

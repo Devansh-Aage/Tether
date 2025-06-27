@@ -2,7 +2,7 @@ import { createServer } from "http";
 import { Server, Socket } from "socket.io";
 import dotenv from "dotenv";
 import { isAuth } from "./middleware/isAuth";
-import { friendReqRoutes } from "./routes/FriendReqRoute";
+import { friendRoutes } from "./routes/FriendReqRoute";
 
 dotenv.config();
 
@@ -32,7 +32,7 @@ io.on("connection", (socket: CustomSocket) => {
   socket.join(`user:${socket.data.userId}`);
 
   //Friend Req Routes
-  friendReqRoutes(socket);
+  friendRoutes(socket);
 
   socket.on("error", (err) => {
     console.log(err);
@@ -41,6 +41,7 @@ io.on("connection", (socket: CustomSocket) => {
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
     activeSockets -= 1;
+    console.log("Active Connections: ", activeSockets);
   });
 });
 
