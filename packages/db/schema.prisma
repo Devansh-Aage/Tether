@@ -112,6 +112,27 @@ model Contest{
   contestMembers User[] @relation("ContestMembers")
 }
 
+model Friendship {
+  id              String   @id @default(uuid()) @db.Uuid
+  userAId         String   @db.Uuid // ID of the first user in the friendship
+  userBId         String   @db.Uuid // ID of the second user in the friendship
+  establishedAt   DateTime @default(now()) // When the friendship was established
+
+  messages Message[]
+
+  // Relations to User model
+  userA           User     @relation("UserFriendA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB           User     @relation("UserFriendB", fields: [userBId], references: [id], onDelete: Cascade)
+
+  //while adding of friends i have to store smaller user ID as user A
+
+  // Enforce uniqueness for the pair (to prevent duplicate friendships)
+  // And ensure order doesn't matter (e.g., (A,B) is same as (B,A))
+  // For simplicity, we can enforce (A,B) unique and always store A < B
+  // Or handle in application logic. For DB constraint, assuming userAId < userBId for canonical representation
+  @@unique([userAId, userBId])
+}
+
 model Message{
   id String @id @default(uuid()) @db.Uuid
   senderId String @db.Uuid
@@ -119,21 +140,16 @@ model Message{
   text String?
   media String?
   timestamp DateTime @default(now())
-  chatId String @db.Uuid
 
-  chat Chat @relation(fields: [chatId],references: [id],onDelete: Cascade)
+  isSent Boolean @default(false)
+  isSeen Boolean @default(false)
+
+  friendshipId String @db.Uuid
+  friendship Friendship @relation(fields: [friendshipId],references: [id],onDelete: Cascade)
 
   sender User @relation("MessageSender",fields: [senderId],references: [id],onDelete: Cascade)
 
   receiver User @relation("MessageReceiver",fields: [receiverId],references: [id],onDelete: Cascade)
-}
-
-model Chat{
-  id String @id @default(uuid()) @db.Uuid
-  messages Message[]
-
-  friendshipId String @db.Uuid @unique
-  friendship  Friendship @relation(fields: [friendshipId],references: [id],onDelete: Cascade)
 }
 
 model CallLog{
@@ -147,27 +163,6 @@ model CallLog{
   caller User @relation("CallSender",fields: [callerId],references: [id],onDelete: Cascade)
 
   receiver User @relation("CallReceiver",fields: [receiverId],references: [id],onDelete: Cascade)
-}
-
-model Friendship {
-  id              String   @id @default(uuid()) @db.Uuid
-  userAId         String   @db.Uuid // ID of the first user in the friendship
-  userBId         String   @db.Uuid // ID of the second user in the friendship
-  establishedAt   DateTime @default(now()) // When the friendship was established
-
-  chat  Chat?
-
-  // Relations to User model
-  userA           User     @relation("UserFriendA", fields: [userAId], references: [id], onDelete: Cascade)
-  userB           User     @relation("UserFriendB", fields: [userBId], references: [id], onDelete: Cascade)
-
-  //while adding of friends i have to store smaller user ID as user A
-
-  // Enforce uniqueness for the pair (to prevent duplicate friendships)
-  // And ensure order doesn't matter (e.g., (A,B) is same as (B,A))
-  // For simplicity, we can enforce (A,B) unique and always store A < B
-  // Or handle in application logic. For DB constraint, assuming userAId < userBId for canonical representation
-  @@unique([userAId, userBId])
 }
 
 model Session {

@@ -3,6 +3,7 @@ import { Server, Socket } from "socket.io";
 import dotenv from "dotenv";
 import { isAuth } from "./middleware/isAuth";
 import { friendRoutes } from "./routes/FriendReqRoute";
+import { chatRoutes } from "./routes/ChatRoutes";
 
 dotenv.config();
 
@@ -33,6 +34,9 @@ io.on("connection", (socket: CustomSocket) => {
 
   //Friend Req Routes
   friendRoutes(socket);
+
+  //Chat req routes
+  chatRoutes(socket);
 
   socket.on("error", (err) => {
     console.log(err);

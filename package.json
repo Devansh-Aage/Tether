@@ -10,6 +10,10 @@
     "dev:http": "pnpm --filter http-server dev",
     "dev:ws": "pnpm --filter ws-server dev",
     "dev:web": "pnpm --filter web dev",
+    "generate": "pnpm --filter @tether/db generate",
+    "migrate": "pnpm --filter @tether/db migrate",
+    "push": "pnpm --filter @tether/db push",
+    "studio": "pnpm --filter @tether/db studio",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

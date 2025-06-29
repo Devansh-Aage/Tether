@@ -8,3 +8,9 @@ export const NEW_FRIEND = "new_friend";
 
 export const DENY_FRIEND_REQ = "deny_friend_req";
 export const DENY_FRIEND_RESPONSE = "deny_friend_res";
+
+export const SEND_MSG_REQ = "send_msg_req";
+export const SEND_MSG_RESPONSE = "send_msg_res";
+
+export const GOT_NEW_MSG = "got_new_msg";
+export const GOT_NEW_MSG_ACK = "got_new_msg_ack";

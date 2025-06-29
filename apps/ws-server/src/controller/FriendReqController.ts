@@ -25,13 +25,13 @@ export const sendFriendRequest = async (
 ) => {
   try {
     const dataValidation = sendFriendReq.safeParse(rawPayload.data);
-    const payload = rawPayload.data;
-    const userId = socket.data.userId;
     if (!dataValidation.success) {
       console.error(dataValidation.error?.errors);
       socket.emit(FRIEND_REQUEST_RESPONSE, "Invalid Payload!");
       return;
     }
+    const payload = rawPayload.data;
+    const userId = socket.data.userId;
 
     if (userId !== payload.senderId) {
       socket.emit(FRIEND_REQUEST_RESPONSE, "Unauthorized!");
@@ -58,16 +58,7 @@ export const sendFriendRequest = async (
       return;
     }
 
-    let smallerUserID;
-    let biggerUserID;
-
-    if (receiverId < senderId) {
-      smallerUserID = receiverId;
-      biggerUserID = senderId;
-    } else {
-      smallerUserID = senderId;
-      biggerUserID = receiverId;
-    }
+    const [smallerUserID, biggerUserID] = [receiverId, senderId].sort();
 
     const isAlreadyFriend = await prisma.friendship.findFirst({
       where: {
@@ -145,13 +136,13 @@ export const acceptFriendRequest = async (
 ) => {
   try {
     const dataValidation = acceptOrDenyFriendReq.safeParse(rawPayload.data);
-    const payload = rawPayload.data;
-    const userId = socket.data.userId;
     if (!dataValidation.success) {
       console.error(dataValidation.error?.errors);
       socket.emit(ACCEPT_FRIEND_RESPONSE, "Invalid Payload!");
       return;
     }
+    const payload = rawPayload.data;
+    const userId = socket.data.userId;
 
     if (userId !== payload.receiverId) {
       socket.emit(ACCEPT_FRIEND_RESPONSE, "Unauthorized!");
@@ -185,16 +176,7 @@ export const acceptFriendRequest = async (
       return;
     }
 
-    let smallerUserID;
-    let biggerUserID;
-
-    if (receiverId < senderId) {
-      smallerUserID = receiverId;
-      biggerUserID = senderId;
-    } else {
-      smallerUserID = senderId;
-      biggerUserID = receiverId;
-    }
+    const [smallerUserID, biggerUserID] = [receiverId, senderId].sort();
 
     const isAlreadyFriend = await prisma.friendship.findFirst({
       where: {
@@ -239,7 +221,7 @@ export const acceptFriendRequest = async (
       "Friend request accepted successfully!"
     );
   } catch (error) {
-    console.error("Error while sending friend request: ", error);
+    console.error("Error while accepting friend request: ", error);
     if (process.env.NODE_ENV !== "production") {
       socket.emit("error", error);
     } else {
@@ -254,13 +236,14 @@ export const denyFriendReq = async (
 ) => {
   try {
     const dataValidation = acceptOrDenyFriendReq.safeParse(rawPayload.data);
-    const payload = rawPayload.data;
-    const userId = socket.data.userId;
     if (!dataValidation.success) {
       console.error(dataValidation.error?.errors);
       socket.emit(DENY_FRIEND_RESPONSE, "Invalid Payload!");
       return;
     }
+
+    const payload = rawPayload.data;
+    const userId = socket.data.userId;
 
     if (userId !== payload.receiverId) {
       socket.emit(DENY_FRIEND_RESPONSE, "Unauthorized!");
@@ -284,7 +267,7 @@ export const denyFriendReq = async (
     });
     socket.emit(DENY_FRIEND_RESPONSE, "Friend request denied!");
   } catch (error) {
-    console.error("Error while sending friend request: ", error);
+    console.error("Error while denying friend request: ", error);
     if (process.env.NODE_ENV !== "production") {
       socket.emit("error", error);
     } else {
