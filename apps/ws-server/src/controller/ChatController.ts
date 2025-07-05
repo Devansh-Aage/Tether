@@ -3,10 +3,9 @@ import { prisma } from "@tether/db/src";
 import dotenv from "dotenv";
 import {
   GOT_NEW_MSG,
-  GOT_NEW_MSG_ACK,
   SEND_MSG_RESPONSE,
 } from "@tether/common/src/eventConstants";
-import { sendMsg, sentMessageSchema } from "@tether/common/src/zodWsSchemas";
+import { sendMsg } from "@tether/common/src/zodWsSchemas";
 import { Socket } from "socket.io";
 
 dotenv.config();
@@ -15,16 +14,16 @@ type SendMesssagePayload = z.infer<typeof sendMsg>;
 
 export const sendMessage = async (
   socket: Socket,
-  rawPayload: { data: SendMesssagePayload }
+  rawPayload:  SendMesssagePayload 
 ) => {
   try {
-    const dataValidation = sendMsg.safeParse(rawPayload.data);
+    const dataValidation = sendMsg.safeParse(rawPayload);
     if (!dataValidation.success) {
       console.error(dataValidation.error?.errors);
       socket.emit(SEND_MSG_RESPONSE, "Invalid Payload!");
       return;
     }
-    const payload = rawPayload.data;
+    const payload = rawPayload;
     const userId = socket.data.userId;
 
     if (userId !== payload.senderId) {
@@ -93,7 +92,7 @@ export const gotNewMsg = async (socket: Socket, payload: { id: string }) => {
       return;
     }
   } catch (error) {
-    console.error("Error while sending message: ", error);
+    console.error("Error while sending got message ack: ", error);
     if (process.env.NODE_ENV !== "production") {
       socket.emit("error", error);
     } else {

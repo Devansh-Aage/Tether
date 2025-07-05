@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import { isAuth } from "./middleware/isAuth";
 import { friendRoutes } from "./routes/FriendReqRoute";
 import { chatRoutes } from "./routes/ChatRoutes";
+import { groupRoutes } from "./routes/GroupRoutes";
+import { getGroupIds } from "./middleware/getGroupIdsOfUsers";
 
 dotenv.config();
 
@@ -26,17 +28,27 @@ io.use(isAuth);
 
 let activeSockets = 0;
 
-io.on("connection", (socket: CustomSocket) => {
+io.on("connection", async (socket: CustomSocket) => {
   activeSockets += 1;
   console.log("Active Connections: ", activeSockets);
 
   socket.join(`user:${socket.data.userId}`);
+
+  const groupIds = await getGroupIds(socket);
+  if (groupIds?.length > 0) {
+    groupIds.forEach((groupId) => {
+      socket.join(`group:${groupId}`);
+    });
+  }
 
   //Friend Req Routes
   friendRoutes(socket);
 
   //Chat req routes
   chatRoutes(socket);
+
+  //Group Routes
+  groupRoutes(socket);
 
   socket.on("error", (err) => {
     console.log(err);

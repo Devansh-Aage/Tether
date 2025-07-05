@@ -21,16 +21,16 @@ type AcceptOrDenyFriendReqPayload = z.infer<typeof acceptOrDenyFriendReq>;
 
 export const sendFriendRequest = async (
   socket: Socket,
-  rawPayload: { data: SendFriendReqPayload }
+  rawPayload: SendFriendReqPayload
 ) => {
   try {
-    const dataValidation = sendFriendReq.safeParse(rawPayload.data);
+    const dataValidation = sendFriendReq.safeParse(rawPayload);
     if (!dataValidation.success) {
       console.error(dataValidation.error?.errors);
       socket.emit(FRIEND_REQUEST_RESPONSE, "Invalid Payload!");
       return;
     }
-    const payload = rawPayload.data;
+    const payload = rawPayload;
     const userId = socket.data.userId;
 
     if (userId !== payload.senderId) {
@@ -132,16 +132,16 @@ export const sendFriendRequest = async (
 
 export const acceptFriendRequest = async (
   socket: Socket,
-  rawPayload: { data: AcceptOrDenyFriendReqPayload }
+  rawPayload:  AcceptOrDenyFriendReqPayload 
 ) => {
   try {
-    const dataValidation = acceptOrDenyFriendReq.safeParse(rawPayload.data);
+    const dataValidation = acceptOrDenyFriendReq.safeParse(rawPayload);
     if (!dataValidation.success) {
       console.error(dataValidation.error?.errors);
       socket.emit(ACCEPT_FRIEND_RESPONSE, "Invalid Payload!");
       return;
     }
-    const payload = rawPayload.data;
+    const payload = rawPayload;
     const userId = socket.data.userId;
 
     if (userId !== payload.receiverId) {
@@ -232,17 +232,17 @@ export const acceptFriendRequest = async (
 
 export const denyFriendReq = async (
   socket: Socket,
-  rawPayload: { data: AcceptOrDenyFriendReqPayload }
+  rawPayload:  AcceptOrDenyFriendReqPayload 
 ) => {
   try {
-    const dataValidation = acceptOrDenyFriendReq.safeParse(rawPayload.data);
+    const dataValidation = acceptOrDenyFriendReq.safeParse(rawPayload);
     if (!dataValidation.success) {
       console.error(dataValidation.error?.errors);
       socket.emit(DENY_FRIEND_RESPONSE, "Invalid Payload!");
       return;
     }
 
-    const payload = rawPayload.data;
+    const payload = rawPayload;
     const userId = socket.data.userId;
 
     if (userId !== payload.receiverId) {

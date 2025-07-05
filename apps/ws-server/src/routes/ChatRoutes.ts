@@ -1,6 +1,5 @@
 import { Socket } from "socket.io";
 import {
-  GOT_NEW_MSG,
   GOT_NEW_MSG_ACK,
   SEND_MSG_REQ,
 } from "@tether/common/src/eventConstants";

@@ -14,3 +14,17 @@ export const SEND_MSG_RESPONSE = "send_msg_res";
 
 export const GOT_NEW_MSG = "got_new_msg";
 export const GOT_NEW_MSG_ACK = "got_new_msg_ack";
+
+export const CREATE_GROUP_REQ = "create_grp_req";
+export const CREATE_GROUP_RES = "create_grp_res";
+
+export const ADD_IN_GROUP_REQ = "add_in_grp_req";
+export const ADD_IN_GROUP_RES = "add_in_grp_res";
+
+export const REMOVE_FROM_GROUP_REQ = "remove_from_grp_req";
+export const REMOVE_FROM_GROUP_RES = "remove_from_grp_res";
+
+export const SEND_MSG_GRP_REQ = "send_msg_grp_req";
+export const SEND_MSG_GRP_RES = "send_msg_grp_res";
+
+export const GOT_NEW_MSG_GRP = "got_new_msg_grp";

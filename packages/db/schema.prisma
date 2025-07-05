@@ -40,15 +40,15 @@ model User {
   callSender CallLog[] @relation("CallSender")
   callReceiver CallLog[] @relation("CallReceiver")
 
-  // Many-to-Many: User is a member of many groups
-  // This implicitly creates a join table (e.g., _GroupToUser) managed by Prisma.
-  // The field name 'memberOfGroups' is more descriptive than just 'groups' here.
-  memberOfGroups Group[] @relation("GroupMembers")
+  //Group messages
+  grpMessageSender GroupMessage[] @relation("GroupMessageSender")
+
+  groupMemberships GroupMembership[]
 
   // One-to-Many: User can be the admin of many groups
   // We need a specific name for this relation because there are two relations
   // between User and Group (adminship and membership).
-  adminOfGroups Group[] @relation("GroupAdmin") 
+  creatorOfGroups Group[] @relation("GroupCreator") 
 
   winnerOfContest Contest[] @relation("ContestWinner") //One to many
   membersOfContest Contest[] @relation("ContestMembers")
@@ -82,34 +82,6 @@ model FriendReq{
   senderId String @db.Uuid
   receiverId String @db.Uuid
   sentAt DateTime @default(now())
-}
-
-model Group{
-  id String @id @default(uuid()) @db.Uuid
-  name String
-  groupImg String?
-  adminId String @db.Uuid
-  members User[] @relation("GroupMembers")
-  admin User @relation("GroupAdmin",fields: [adminId], references: [id], onDelete: Cascade)
-
-  contest Contest[] //One to Many
-}
-
-model Contest{
-  id String @id @default(uuid()) @db.Uuid
-  title String
-  description String
-  startTime DateTime
-  endTime DateTime
-  totalStakeAmount Int @default(0)
-  winnerId String? @db.Uuid //foreign key
-  groupId String @db.Uuid //foreign key
-  
-  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade) //virtual table
-
-  winner User? @relation("ContestWinner",fields: [winnerId], references: [id], onDelete: Cascade)
-
-  contestMembers User[] @relation("ContestMembers")
 }
 
 model Friendship {
@@ -151,6 +123,70 @@ model Message{
 
   receiver User @relation("MessageReceiver",fields: [receiverId],references: [id],onDelete: Cascade)
 }
+
+
+model Group{
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  groupImg String?
+  creatorId String @db.Uuid
+
+  creator User @relation("GroupCreator",fields: [creatorId], references: [id], onDelete: Cascade)
+
+  contest Contest[] //One to Many
+
+  messages GroupMessage[]
+
+  groupMemberships GroupMembership[]
+}
+
+model GroupMembership {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  groupId   String   @db.Uuid
+  joinedAt  DateTime @default(now())
+  isAdmin   Boolean  @default(false)
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId]) // Prevent duplicate memberships
+}
+
+model GroupMessage{
+  id String @id @default(uuid()) @db.Uuid
+  senderId String @db.Uuid
+  text String?
+  media String?
+  timestamp DateTime @default(now())
+
+  isSent String[] @db.Uuid
+  isSeen String[] @db.Uuid
+
+  groupId String @db.Uuid
+  group Group @relation(fields: [groupId],references: [id],onDelete: Cascade)
+
+  sender User @relation("GroupMessageSender",fields: [senderId],references: [id],onDelete: Cascade)
+}
+
+
+model Contest{
+  id String @id @default(uuid()) @db.Uuid
+  title String
+  description String
+  startTime DateTime
+  endTime DateTime
+  totalStakeAmount Int @default(0)
+  winnerId String? @db.Uuid //foreign key
+  groupId String @db.Uuid //foreign key
+  
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade) //virtual table
+
+  winner User? @relation("ContestWinner",fields: [winnerId], references: [id], onDelete: Cascade)
+
+  contestMembers User[] @relation("ContestMembers")
+}
+
 
 model CallLog{
   id String @id @default(uuid()) @db.Uuid
