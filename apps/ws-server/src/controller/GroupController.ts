@@ -125,11 +125,34 @@ export const addMember = async (socket: Socket, rawPayload: AddInGroup) => {
     const friendIds = friends.map((f) =>
       f.userAId === userId ? f.userBId : f.userAId
     );
-    const memberIds = payload.memberIds.filter((id) => id !== userId);
-    const allAreFriends = memberIds.every((id) => friendIds.includes(id));
+    const allAreFriends = payload.memberIds.every((id) =>
+      friendIds.includes(id)
+    );
 
     if (!allAreFriends) {
       socket.emit(ADD_IN_GROUP_RES, "Invalid Member IDs!");
+      return;
+    }
+
+    const grpMembers = await prisma.groupMembership.findMany({
+      where: {
+        groupId: payload.groupId,
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    const alreadyMemberIds = grpMembers.flatMap((members) => members.userId);
+
+    const alreadyMembers = payload.memberIds.every((id) =>
+      alreadyMemberIds.includes(id)
+    );
+    if (alreadyMembers) {
+      socket.emit(
+        ADD_IN_GROUP_RES,
+        "Some users are already part of the group!"
+      );
       return;
     }
 
