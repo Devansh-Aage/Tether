@@ -5,7 +5,7 @@ dotenv.config();
 
 export const isAuth = async (socket: Socket, next: (err?: Error) => void) => {
   try {
-    const response = fetch(`${process.env.HTTP_URL}/socket/auth`, {
+    const response = fetch(`${process.env.HTTP_URL}/app/auth`, {
       method: "GET",
       headers: {
         Cookie: socket.handshake.headers.cookie || "",

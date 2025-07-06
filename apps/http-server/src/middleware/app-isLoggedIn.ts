@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-export const socketIsLoggedIn: RequestHandler = async (req, res) => {
+export const appIsLoggedIn: RequestHandler = async (req, res) => {
   try {
     if (!req.session || !req.session.userId) {
       res.status(401).json({ error: "Unauthorized" });

@@ -1,12 +1,12 @@
 import express from "express";
 import session from "express-session";
 import dotenv from "dotenv";
-import cors from "cors"; // For generating the state parameter
+import cors from "cors";
 import { Pool } from "pg"; // For connect-pg-simple
 import AuthRouter from "./routes/authRoutes";
 import TaskRouter from "./routes/taskRoutes";
 import MilestoneRouter from "./routes/milestoneRoutes";
-import { socketIsLoggedIn } from "./middleware/socket-isLoggedIn";
+import { appIsLoggedIn } from "./middleware/app-isLoggedIn";
 
 dotenv.config();
 
@@ -39,7 +39,7 @@ app.use(
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days cookie lifetime
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Use secure cookies in production (HTTPS)
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Protecs against some CSRF attacks
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Protects against some CSRF attacks
     },
   })
 );
@@ -56,7 +56,7 @@ app.use("/api/auth", AuthRouter);
 app.use("/api/task", TaskRouter);
 app.use("/api/milestone", MilestoneRouter);
 
-app.get("/api/socket/auth", socketIsLoggedIn);
+app.get("/api/app/auth", appIsLoggedIn);
 
 app.listen(process.env.HTTP_PORT, () => {
   console.log(`HTTP server listening on ${process.env.HTTP_PORT}`);
