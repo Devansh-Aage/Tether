@@ -64,9 +64,7 @@ export const register: RequestHandler = async (req, res) => {
   } catch (error) {
     // Log and send error response in case of an exception
     console.error("Error occurred during registration:", error);
-    res
-      .status(500)
-      .json({ message: "Error occurred while registering.", error });
+    res.status(500).json({ message: "Error occurred while registering." });
   }
 };
 
@@ -128,9 +126,7 @@ export const login: RequestHandler = async (req, res) => {
   } catch (error) {
     // Log and send error response in case of an exception
     console.error("Error occurred during login: ", error);
-    res
-      .status(500)
-      .json({ message: "Error occurred while logging in.", error });
+    res.status(500).json({ message: "Error occurred while logging in." });
   }
 };
 
@@ -272,5 +268,28 @@ export const logout: RequestHandler = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Failed to Logout!" });
     console.error("Failed to Logout: ", error);
+  }
+};
+
+export const getUserData: RequestHandler = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized!" });
+      return;
+    }
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      res.status(401).json({ message: "User not found!" });
+      return;
+    }
+    res.status(200).json({ user });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to get user data!" });
+    console.error("Failed to get user data: ", error);
   }
 };

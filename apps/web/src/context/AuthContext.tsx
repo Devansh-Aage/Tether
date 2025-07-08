@@ -22,9 +22,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
-
+  const queryClient = useQueryClient();
+  
   const checkAuth = async () => {
     try {
       setIsLoading(true);

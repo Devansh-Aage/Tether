@@ -1,17 +1,17 @@
+@import url("https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 @theme inline {
-  --color-dark-bg: oklch(12.5% 0.03 192.5);
+  --color-dark-bg: oklch(0.244 0.013 205.528);
   --color-light-bg: oklch(0.968 0.015 184.66);
-  --color-action: oklch(0.771 0.233 184.68);
+  --color-action: oklch(0.6506 0.1211 189.72);
+  --font-nunito: "Nunito Sans", sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
