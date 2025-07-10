@@ -5,7 +5,8 @@ import { useQuery } from '@tanstack/react-query'
 import axios from "axios"
 import { type User } from "@tether/db/src/types"
 import { Skeleton } from './ui/skeleton'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu'
+import { Button } from './ui/button'
 
 
 interface SidebarProps {
@@ -44,18 +45,18 @@ const Sidebar: FC<SidebarProps> = ({ }) => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem>
+                                    <DropdownMenuLabel>
                                         {data?.user.username}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuLabel className='text-xs'>
                                         {data?.user.email}
-                                    </DropdownMenuItem>
+                                    </DropdownMenuLabel>
                                 </DropdownMenuGroup>
-                                <DropdownMenuSeparator />
+                                <DropdownMenuSeparator className='mb-2' />
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem>
+                                    <Button size="sm" className='bg-red-500 hover:bg-red-700 text-white w-full'>
                                         Sign out
-                                    </DropdownMenuItem>
+                                    </Button>
                                 </DropdownMenuGroup>
                             </DropdownMenuContent>
                         </DropdownMenu>
