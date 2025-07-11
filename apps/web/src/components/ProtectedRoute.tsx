@@ -7,9 +7,9 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: FC<ProtectedRouteProps> = ({ }) => {
-    const { isAuthenticated, isLoading } = useAuth()
+    const { isAuthenticated, isAuthLoading } = useAuth()
 
-    if (isLoading) {
+    if (isAuthLoading) {
         return (
             <div>Loading ...</div>
         )

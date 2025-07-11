@@ -33,12 +33,20 @@ export const sendFriendRequest = async (
     const payload = rawPayload;
     const userId = socket.data.userId;
 
-    if (userId !== payload.senderId) {
-      socket.emit(FRIEND_REQUEST_RESPONSE, "Unauthorized!");
+    const receiverEmail = payload.receiverEmail;
+
+    const receiver = await prisma.user.findFirst({
+      where: {
+        email: receiverEmail,
+      },
+    });
+
+    if(!receiver){
+      socket.emit(FRIEND_REQUEST_RESPONSE, "The user doesn't exist");
       return;
     }
 
-    const { receiverId, senderId } = payload;
+    const receiverId = receiver.id;
 
     if (receiverId === userId) {
       socket.emit(
@@ -48,17 +56,8 @@ export const sendFriendRequest = async (
       return;
     }
 
-    const receiverUser = await prisma.user.findUnique({
-      where: {
-        id: receiverId,
-      },
-    });
-    if (!receiverUser) {
-      socket.emit(FRIEND_REQUEST_RESPONSE, "The user doesn't exist");
-      return;
-    }
 
-    const [smallerUserID, biggerUserID] = [receiverId, senderId].sort();
+    const [smallerUserID, biggerUserID] = [receiverId, userId].sort();
 
     const isAlreadyFriend = await prisma.friendship.findFirst({
       where: {
@@ -73,7 +72,7 @@ export const sendFriendRequest = async (
 
     const isAlreadySentReq = await prisma.friendReq.findFirst({
       where: {
-        senderId: senderId,
+        senderId: userId,
         receiverId: receiverId,
       },
     });
@@ -88,7 +87,7 @@ export const sendFriendRequest = async (
     const isRecieverAlreadySentReq = await prisma.friendReq.findFirst({
       where: {
         senderId: receiverId,
-        receiverId: senderId,
+        receiverId: userId,
       },
     });
     if (isRecieverAlreadySentReq) {
@@ -101,14 +100,14 @@ export const sendFriendRequest = async (
 
     await prisma.friendReq.create({
       data: {
-        senderId: senderId,
+        senderId: userId,
         receiverId: receiverId,
       },
     });
 
     const sender = await prisma.user.findUnique({
       where: {
-        id: senderId,
+        id: userId,
       },
       select: {
         id: true,
@@ -132,7 +131,7 @@ export const sendFriendRequest = async (
 
 export const acceptFriendRequest = async (
   socket: Socket,
-  rawPayload:  AcceptOrDenyFriendReqPayload 
+  rawPayload: AcceptOrDenyFriendReqPayload
 ) => {
   try {
     const dataValidation = acceptOrDenyFriendReq.safeParse(rawPayload);
@@ -202,7 +201,6 @@ export const acceptFriendRequest = async (
       },
     });
 
-    //To-Do send only necessary info of user
     const user = await prisma.user.findUnique({
       where: {
         id: userId,
@@ -212,6 +210,8 @@ export const acceptFriendRequest = async (
         email: true,
         username: true,
         profileImg: true,
+        pubKey: true,
+        createdAt: true,
       },
     });
 
@@ -232,7 +232,7 @@ export const acceptFriendRequest = async (
 
 export const denyFriendReq = async (
   socket: Socket,
-  rawPayload:  AcceptOrDenyFriendReqPayload 
+  rawPayload: AcceptOrDenyFriendReqPayload
 ) => {
   try {
     const dataValidation = acceptOrDenyFriendReq.safeParse(rawPayload);

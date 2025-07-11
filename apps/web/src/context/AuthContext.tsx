@@ -12,7 +12,7 @@ import { toast } from "sonner";
 type AuthContextType = {
   userId: string | null;
   isAuthenticated: boolean;
-  isLoading: boolean;
+  isAuthLoading: boolean;
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -21,13 +21,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
   const checkAuth = async () => {
     try {
-      setIsLoading(true);
+      setIsAuthLoading(true);
       const res = await fetch(`${import.meta.env.VITE_HTTP_URL}app/auth`, {
         credentials: "include",
       });
@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error(error);
     } finally {
-      setIsLoading(false);
+      setIsAuthLoading(false);
     }
   };
 
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value: AuthContextType = {
     userId,
-    isLoading,
+    isAuthLoading,
     checkAuth,
     logout,
     isAuthenticated: !!userId,

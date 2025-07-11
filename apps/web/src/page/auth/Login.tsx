@@ -1,7 +1,7 @@
 import { useState, type FC } from 'react'
 import { z } from "zod";
 import { loginUser } from "@tether/common/src/zodHttpSchemas";
-import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router';
+import { NavLink, redirect, useNavigate, useSearchParams } from 'react-router';
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import InputTether from '@/components/ui/InputTether';
@@ -54,7 +54,11 @@ const Login: FC<LoginProps> = ({ }) => {
             if (res.ok) {
                 await checkAuth()
                 toast.success("Logged in Tether");
-                router("/dashboard")
+                redirect("/dashboard")
+            }
+            else if (res.status === 429) {
+                const response = await res.json();
+                toast.error(response.message)
             }
             else {
                 const response = await res.json();

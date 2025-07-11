@@ -1,15 +1,18 @@
-import Sidebar from "@/components/Sidebar"
+import FriendsList from "@/components/dashboard/FriendsList"
+import Sidebar from "@/components/dashboard/Sidebar"
 import type { FC } from "react"
+import { Outlet } from "react-router"
 
 
 interface DashboardProps {
-
 }
 
 const Dashboard: FC<DashboardProps> = ({ }) => {
     return (
-        <div className='text-white w-full h-screen font-nunito flex '>
+        <div className=' w-full h-screen font-nunito flex '>
             <Sidebar />
+            <FriendsList />
+            <Outlet />
         </div>
     )
 }

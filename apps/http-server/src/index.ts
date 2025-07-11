@@ -6,6 +6,7 @@ import { Pool } from "pg"; // For connect-pg-simple
 import AuthRouter from "./routes/authRoutes";
 import TaskRouter from "./routes/taskRoutes";
 import MilestoneRouter from "./routes/milestoneRoutes";
+import HelperRouter from "./routes/helperRoutes";
 import { appIsLoggedIn } from "./middleware/app-isLoggedIn";
 
 dotenv.config();
@@ -55,6 +56,7 @@ app.use(
 app.use("/api/auth", AuthRouter);
 app.use("/api/task", TaskRouter);
 app.use("/api/milestone", MilestoneRouter);
+app.use("/api/helper", HelperRouter);
 
 app.get("/api/app/auth", appIsLoggedIn);
 

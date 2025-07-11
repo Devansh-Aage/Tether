@@ -8,13 +8,14 @@ import {
 interface SideLinkProps {
     icon: ReactNode,
     text: string
+    to: string
 }
 
-const SideLink: FC<SideLinkProps> = ({ icon, text }) => {
+const SideLink: FC<SideLinkProps> = ({ icon, text, to }) => {
     return (
         <Tooltip>
             <TooltipTrigger>
-                <NavLink to="/test" className={({ isActive }) => `p-3 flex items-center justify-center hover:opacity-85 rounded-md ${isActive ? "bg-white text-dark-bg" : "bg-cyan-800 text-slate-200"}`}>
+                <NavLink to={to} className={({ isActive }) => `p-3 flex items-center justify-center hover:opacity-85 rounded-md ${isActive ? "dark:bg-cyan-400 bg-cyan-950 text-white" : "dark:bg-cyan-800 bg-cyan-700 text-slate-200"}`}>
                     {icon}
                 </NavLink>
             </TooltipTrigger>

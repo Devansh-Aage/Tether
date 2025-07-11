@@ -1,8 +1,7 @@
 import { z } from "zod";
 
 export const sendFriendReq = z.object({
-  senderId: z.string().uuid("Invalid ID"),
-  receiverId: z.string().uuid("Invalid ID"),
+  receiverEmail: z.string().email("Please enter a valid email!"),
 });
 
 export const acceptOrDenyFriendReq = z.object({
@@ -48,7 +47,6 @@ export const removeMemberSchema = z.object({
   groupId: z.string().uuid("Invalid ID"),
   memberId: z.string().uuid("Invalid ID"),
 });
-
 
 export const sendMsgInGroupSchema = z
   .object({

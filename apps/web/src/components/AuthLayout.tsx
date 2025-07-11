@@ -7,8 +7,8 @@ interface AuthLayoutProps {
 }
 
 const AuthLayout: FC<AuthLayoutProps> = ({ children }) => {
-    const { isAuthenticated, isLoading } = useAuth()
-    if (isLoading) {
+    const { isAuthenticated, isAuthLoading } = useAuth()
+    if (isAuthLoading) {
         return (
             <div>Loading ...</div>
         )
