@@ -11,10 +11,12 @@ export interface Friend {
 }
 
 export interface FriendRequest {
-    sentAt: Date;
-    id: string;
-    email: string;
-    username: string;
-    profileImg: string | null;
-    pubKey: string | null;
+  id: string;
+  senderId: string;
+  receiverId: string;
+  sentAt: Date;
+  senderImg: string;
+  senderEmail: string;
+  senderUsername: string;
+  senderPubkey: string;
 }

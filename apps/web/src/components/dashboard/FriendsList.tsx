@@ -1,11 +1,12 @@
 import { useEffect, useState, type FC } from 'react'
 import FriendCard from './FriendCard'
 import { useAuth } from '@/context/AuthContext'
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Skeleton } from '../ui/skeleton';
 import type { Friend } from '@tether/db/src/types';
 import socket from '@/lib/socket';
+import { NEW_FRIEND } from '@tether/common/src/eventConstants';
 
 
 interface FriendsListProps {
@@ -13,11 +14,11 @@ interface FriendsListProps {
 }
 
 const FriendsList: FC<FriendsListProps> = ({ }) => {
-    const { userId, isAuthLoading } = useAuth();
+    const queryClient = useQueryClient()
+    const { isAuthLoading } = useAuth();
     const [input, setInput] = useState("")
-    const [friends, setFriends] = useState<Friend[]>()
 
-    const { data, isLoading, isSuccess } = useQuery({
+    const { data, isLoading } = useQuery({
         queryKey: ["userFriends"],
         queryFn: async (): Promise<{ friends: Friend[] }> => {
             const res = await axios.get(`${import.meta.env.VITE_HTTP_URL}helper/get-friends`, {
@@ -26,15 +27,25 @@ const FriendsList: FC<FriendsListProps> = ({ }) => {
             return res.data
         },
     })
+
     useEffect(() => {
-        if (isSuccess) {
-            setFriends(data.friends)
+        const incomingFrndReqHandler = (newfrnd: Friend) => {
+            // queryClient.setQueryData<{ friends: Friend[] }>(
+            //     ["userFriends"],
+            //     (old) => ({
+            //         friends: [...(old?.friends ?? []), newfrnd]
+            //     })
+            // );
+            queryClient.invalidateQueries({ queryKey: ["userFriends"] });
         }
-    }, [isSuccess, data])
+        socket.on(NEW_FRIEND, incomingFrndReqHandler)
+        return (() => {
+            socket.off(NEW_FRIEND, incomingFrndReqHandler)
+        })
+    }, [])
 
 
-
-    const filteredChats = friends?.filter((friend) =>
+    const filteredChats = data?.friends?.filter((friend) =>
         friend.username.toLowerCase().includes(input.toLowerCase())
     );
     return (
@@ -43,7 +54,7 @@ const FriendsList: FC<FriendsListProps> = ({ }) => {
             {
                 isAuthLoading || isLoading ?
                     Array.from({ length: 7 }).map((_, i) => (
-                        <Skeleton key={i} className='w-full h-28' />
+                        <Skeleton key={i} className='w-full h-14 mb-1 bg-foreground/20 ' />
                     ))
                     :
                     filteredChats &&

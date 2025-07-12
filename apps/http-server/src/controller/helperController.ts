@@ -19,7 +19,7 @@ export const getFriends: RequestHandler = async (req, res) => {
       },
     });
     if (friendships.length == 0) {
-      res.status(400).json({ message: "Your friend list is empty." });
+      res.status(200).json({ friends: [] });
       return;
     }
     const rawFriends = friendships.map((f) =>
@@ -55,12 +55,12 @@ export const getFriendReq: RequestHandler = async (req, res) => {
       return;
     }
 
-    const friendReq = await prisma.friendReq.findMany({
+    const allFriendReq = await prisma.friendReq.findMany({
       where: {
         receiverId: userId,
       },
     });
-    const requestorIds = friendReq.map((fR) => fR.senderId);
+    const requestorIds = allFriendReq.map((fR) => fR.senderId);
     const requestors = await prisma.user.findMany({
       where: {
         id: {
@@ -76,12 +76,19 @@ export const getFriendReq: RequestHandler = async (req, res) => {
         createdAt: true,
       },
     });
-    const sentAtMap = new Map(friendReq.map((fr) => [fr.senderId, fr.sentAt]));
-    const requestSenders = requestors.map((user) => ({
-      ...user,
-      sentAt: sentAtMap.get(user.id),
-    }));
-    res.status(200).json({ requestSenders });
+
+    const friendReq = allFriendReq.map((frndReq) => {
+      const sender = requestors.find((req) => req.id === frndReq.senderId);
+      return {
+        ...frndReq,
+        senderImg: sender?.profileImg,
+        senderEmail: sender?.email,
+        senderUsername: sender?.username,
+        senderPubkey: sender?.pubKey,
+      };
+    });
+
+    res.status(200).json({ friendReq });
   } catch (error) {
     console.error("Error occurred during fetching friend req:", error);
     res.status(500).json({

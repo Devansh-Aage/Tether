@@ -41,7 +41,7 @@ export const sendFriendRequest = async (
       },
     });
 
-    if(!receiver){
+    if (!receiver) {
       socket.emit(FRIEND_REQUEST_RESPONSE, "The user doesn't exist");
       return;
     }
@@ -55,7 +55,6 @@ export const sendFriendRequest = async (
       );
       return;
     }
-
 
     const [smallerUserID, biggerUserID] = [receiverId, userId].sort();
 
@@ -98,7 +97,7 @@ export const sendFriendRequest = async (
       return;
     }
 
-    await prisma.friendReq.create({
+    const friendReq = await prisma.friendReq.create({
       data: {
         senderId: userId,
         receiverId: receiverId,
@@ -114,10 +113,20 @@ export const sendFriendRequest = async (
         email: true,
         username: true,
         profileImg: true,
+        pubKey: true,
       },
     });
+    const friendReqToEmit = {
+      ...friendReq,
+      senderImg: sender?.profileImg,
+      senderEmail: sender?.email,
+      senderUsername: sender?.username,
+      senderPubkey: sender?.pubKey,
+    };
 
-    socket.to(`user:${receiverId}`).emit(INCOMING_FRIEND_REQUEST, sender);
+    socket
+      .to(`user:${receiverId}`)
+      .emit(INCOMING_FRIEND_REQUEST, friendReqToEmit);
     socket.emit(FRIEND_REQUEST_RESPONSE, "Friend request sent successfully!");
   } catch (error) {
     console.error("Error while sending friend request: ", error);

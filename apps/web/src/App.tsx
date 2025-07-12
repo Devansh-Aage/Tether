@@ -6,20 +6,11 @@ import Dashboard from './page/protected/Dashboard'
 import { Toaster } from './components/ui/sonner'
 import SignUp from './page/auth/SignUp'
 import ProtectedRoute from './components/ProtectedRoute'
-import AddFriend from './page/protected/AddFriend'
-import { useEffect } from 'react'
-import socket from './lib/socket'
+import AddFriendPage from './page/protected/AddFriendPage'
 
 function App() {
 
-  useEffect(() => {
-    if (!socket.connected) {
-      socket.connect()
-    }
-    return (() => {
-      socket.disconnect()
-    })
-  }, [])
+
 
 
   return (
@@ -34,7 +25,7 @@ function App() {
 
         <Route element={<ProtectedRoute />} >
           <Route path='dashboard' element={<Dashboard />} >
-            <Route path='add-friend' element={<AddFriend />} />
+            <Route path='add-friend' element={<AddFriendPage />} />
           </Route>
         </Route>
 
