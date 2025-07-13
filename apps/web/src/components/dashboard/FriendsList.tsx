@@ -29,13 +29,7 @@ const FriendsList: FC<FriendsListProps> = ({ }) => {
     })
 
     useEffect(() => {
-        const incomingFrndReqHandler = (newfrnd: Friend) => {
-            // queryClient.setQueryData<{ friends: Friend[] }>(
-            //     ["userFriends"],
-            //     (old) => ({
-            //         friends: [...(old?.friends ?? []), newfrnd]
-            //     })
-            // );
+        const incomingFrndReqHandler = (_newfrnd: Friend) => {
             queryClient.invalidateQueries({ queryKey: ["userFriends"] });
         }
         socket.on(NEW_FRIEND, incomingFrndReqHandler)
@@ -63,7 +57,7 @@ const FriendsList: FC<FriendsListProps> = ({ }) => {
                             <FriendCard friend={friend} key={friend.email} />
                         ))
                         :
-                        <p>Friend list is empty</p>
+                        <p className='ml-4 mt-4'>Friend list is empty</p>
 
 
             }

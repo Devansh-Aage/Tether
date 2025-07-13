@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query'
 import axios from "axios"
 import { type FriendRequest, type User } from "@tether/db/src/types"
 import { Skeleton } from '../ui/skeleton'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
 import { Button } from '../ui/button'
 import { useAuth } from '@/context/AuthContext'
 import Avatar from '../avatar'
@@ -37,7 +36,7 @@ const Sidebar: FC<SidebarProps> = ({ }) => {
     });
 
     useEffect(() => {
-        const incomingFrndReqHandler = (data: FriendRequest) => {
+        const incomingFrndReqHandler = (_data: FriendRequest) => {
             setFriendReqCount((prev) => prev || 0 + 1)
         }
         socket.on(INCOMING_FRIEND_REQUEST, incomingFrndReqHandler)
@@ -51,11 +50,6 @@ const Sidebar: FC<SidebarProps> = ({ }) => {
             setFriendReqCount(undefined)
         }
     }, [location])
-
-
-
-
-
 
     return (
         <div className='w-16 h-full font-nunito bg-cyan-300 dark:bg-cyan-950 flex flex-col justify-between items-center'>

@@ -18,7 +18,7 @@ const FriendCard: FC<FriendCardProps> = ({ friend }) => {
             }
             <div className='flex-1 min-w-0'>
                 <p>{friend.username}</p>
-                <p className='text-sm truncate'>Last text:shshhsh Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro, in fugiat numquam alias possimus molestias? Natus expedita aspernatur maxime odit?</p>
+                {/* <p className='text-sm truncate'>Last text:shshhsh Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro, in fugiat numquam alias possimus molestias? Natus expedita aspernatur maxime odit?</p> */}
             </div>
 
         </div>
