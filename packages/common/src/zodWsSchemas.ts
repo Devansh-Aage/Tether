@@ -29,7 +29,10 @@ export const sentMessageSchema = z.object({
 });
 
 export const createGroupSchema = z.object({
-  name: z.string().min(1, "Group name must have at least one character"),
+  name: z
+    .string()
+    .min(1, "Group name must have at least one character")
+    .max(32, "Group name too long!"),
   creatorId: z.string().uuid("Invalid ID"),
   memberIds: z
     .array(z.string().uuid("Invalid ID"))

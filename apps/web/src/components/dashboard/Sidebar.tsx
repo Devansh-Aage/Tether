@@ -57,7 +57,7 @@ const Sidebar: FC<SidebarProps> = ({ }) => {
                 <p className='font-semibold text-3xl mt-5 mb-10 text-center'>T</p>
                 <div className='flex flex-col gap-3 '>
                     <SideLink unseenReqCount={friendReqCount} to="/dashboard/add-friend" icon={<UserPlus size={20} />} text='Add Friend' />
-                    <SideLink to="/dashboard/add-task" icon={<ClipboardPenLine size={20} />} text='Add Task' />
+                    <SideLink to="/dashboard/tasks" icon={<ClipboardPenLine size={20} />} text='Add Task' />
                 </div>
             </div>
             <div className='pb-5'>

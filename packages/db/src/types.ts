@@ -1,5 +1,5 @@
-import { User, FriendReq } from "@prisma/client";
-export type { User, FriendReq };
+import { User, FriendReq, Task, Milestone } from "@prisma/client";
+export type { User, FriendReq, Task, Milestone };
 
 export interface Friend {
   id: string;

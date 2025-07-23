@@ -19,8 +19,7 @@ type FormData = z.infer<typeof loginUser>
 
 const Login: FC<LoginProps> = ({ }) => {
     const [googleLoading, setGoogleLoading] = useState(false)
-    const router = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const errAuthParams = searchParams.get('err')
     const { checkAuth } = useAuth()
 
@@ -91,8 +90,8 @@ const Login: FC<LoginProps> = ({ }) => {
                 <div className=' max-w-lg  flex flex-col gap-3'>
                     <p className='text-black dark:text-white font-medium text-center text-3xl'>Log in to Tether</p>
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <InputTether error={errors.email?.message} {...register("email")} htmlFor='email' title='Email' />
-                        <InputTether error={errors.password?.message} {...register("password")} htmlFor='password' title='Password' />
+                        <InputTether error={errors.email?.message} {...register("email")} htmlFor='email' title='Email' className='w-xs' />
+                        <InputTether error={errors.password?.message} {...register("password")} htmlFor='password' title='Password' className='w-xs' />
                         <Button disabled={isSubmitting || googleLoading} className='mt-5 py-5 w-full font-semibold text-lg' variant='tether' >{isSubmitting ? 'Logging in...' : 'Log in'}</Button>
                     </form>
                     <Separator className='my-3 h-[2px] ' />

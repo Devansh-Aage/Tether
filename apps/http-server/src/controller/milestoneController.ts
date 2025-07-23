@@ -169,3 +169,25 @@ export const deleteMilestone: RequestHandler = async (req, res) => {
     });
   }
 };
+
+export const getMilestonesOfUser: RequestHandler = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+    const milestones = await prisma.milestone.findMany({
+      where: {
+        userId: userId,
+      },
+    });
+    res.status(200).json({ milestones });
+  } catch (error) {
+    console.error("Error occurred fetching milestones:", error);
+    res.status(500).json({
+      message: "Error occurred fetching milestones",
+      error: process.env.NODE_ENV !== "production" ? error : undefined,
+    });
+  }
+};
