@@ -181,6 +181,9 @@ export const getMilestonesOfUser: RequestHandler = async (req, res) => {
       where: {
         userId: userId,
       },
+      orderBy: {
+        deadline: "asc",
+      },
     });
     res.status(200).json({ milestones });
   } catch (error) {

@@ -15,9 +15,7 @@ import { addTask } from '@tether/common/src/zodHttpSchemas'
 import { useAuth } from '@/context/AuthContext'
 import { toast } from 'sonner'
 
-interface DailyTaskProps {
-
-}
+interface DailyTaskProps {}
 
 type FormData = z.infer<typeof addTask>
 
@@ -153,10 +151,12 @@ const DailyTask: FC<DailyTaskProps> = ({ }) => {
                             <Skeleton key={i} className='w-full h-16 mb-1 bg-foreground/20 ' />
                         ))
                         :
-                        data?.tasks && data?.tasks.length > 0 &&
-                        data?.tasks.map((task) => (
-                            <TasksCard handleDeleteTask={deleteTaskMutation.mutate} task={task} key={task.id} />
-                        ))
+                        data?.tasks && data?.tasks.length > 0 ?
+                            data?.tasks.map((task) => (
+                                <TasksCard handleDeleteTask={deleteTaskMutation.mutate} task={task} key={task.id} />
+                            ))
+                            :
+                            <p>No daily tasks added yet.</p>
                     }
                 </div>
             </ScrollArea>

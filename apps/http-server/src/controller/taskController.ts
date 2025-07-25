@@ -179,6 +179,9 @@ export const getTasksOfUser: RequestHandler = async (req, res) => {
       where: {
         userId: userId,
       },
+      orderBy: {
+        isDone: "asc",
+      },
     });
     res.status(200).json({ tasks });
   } catch (error) {

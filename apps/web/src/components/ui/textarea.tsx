@@ -3,11 +3,12 @@ import { cn } from "@/lib/utils"
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
+  error?: string
 }
-function Textarea({ className, label, ...props }: TextareaProps) {
+function Textarea({ className, label, error, ...props }: TextareaProps) {
   const textareaId = props.id || ""; // Ensure id is passed to textarea if provided
   return (
-    <div className="mt-3">
+    <div className="">
       <label htmlFor={textareaId} className='text-sm font-medium' >{label}</label>
       <textarea
         id={textareaId}
@@ -18,6 +19,7 @@ function Textarea({ className, label, ...props }: TextareaProps) {
         )}
         {...props}
       />
+      {error && <p className="text-sm text-red-700 mt-1">{error}</p>}
     </div>
 
   )

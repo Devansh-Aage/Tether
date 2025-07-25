@@ -42,5 +42,8 @@ export const addMilestone = z.object({
     .string()
     .min(10, "The description must be at least 10 characters long")
     .max(200, "Milestone description too long!"),
-  deadline: z.string().date("Please Enter a valid Date"),
+  deadline: z.coerce.date({
+    required_error: "Please enter a valid date",
+    invalid_type_error: "Invalid date format",
+  }),
 });

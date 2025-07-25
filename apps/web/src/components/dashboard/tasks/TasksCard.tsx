@@ -34,7 +34,7 @@ const TasksCard: FC<TasksCardProps> = ({ task, handleDeleteTask }) => {
     return (
         <div className='flex group items-center mb-3 justify-center gap-3 w-[95% mx-auto]' >
             <div
-                onClick={() => completeTaskMutation.mutate()}
+                onClick={() => !isDoneState && completeTaskMutation.mutate()}
                 className={`flex flex-1 items-center px-3 py-2 bg-gradient-to-r from-cyan-200 dark:from-cyan-900 to-transparent rounded-lg cursor-pointer transition duration-300 ring-2 ring-transparent group-hover:ring-action`}
             >
                 {
