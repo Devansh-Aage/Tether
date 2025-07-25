@@ -192,3 +192,42 @@ export const getTasksOfUser: RequestHandler = async (req, res) => {
     });
   }
 };
+
+export const getTasksOfFriend: RequestHandler = async (req, res) => {
+  try {
+    const { friendId } = req.params;
+    const userId = req.userId;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+    const [smallerUserID, biggerUserID] = [friendId, userId].sort();
+
+    const isFriend = await prisma.friendship.findFirst({
+      where: {
+        userAId: smallerUserID,
+        userBId: biggerUserID,
+      },
+    });
+    if (!isFriend) {
+      res.status(401).json({ message: "Not a Friend!" });
+      return;
+    }
+
+    const tasks = await prisma.task.findMany({
+      where: {
+        userId: friendId,
+      },
+      orderBy: {
+        isDone: "asc",
+      },
+    });
+    res.status(200).json({ tasks });
+  } catch (error) {
+    console.error("Error occurred fetching friend's daily tasks:", error);
+    res.status(500).json({
+      message: "Error occurred fetching friend's daily tasks",
+      error: process.env.NODE_ENV !== "production" ? error : undefined,
+    });
+  }
+};

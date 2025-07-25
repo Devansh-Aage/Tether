@@ -1,6 +1,7 @@
 import type { Friend } from '@tether/db/src/types'
 import { type FC } from 'react'
 import Avatar from '../avatar'
+import { useNavigate } from 'react-router'
 
 
 interface FriendCardProps {
@@ -8,11 +9,15 @@ interface FriendCardProps {
 }
 
 const FriendCard: FC<FriendCardProps> = ({ friend }) => {
+    const navigate = useNavigate()
+    const handleClick = () => {
+        navigate(`chat/${friend.friendshipId}`, { state: { friendImg: friend.profileImg, friendName: friend.username, friendId: friend.id } })
+    }
     return (
-        <div className='w-full flex gap-4 items-center py-2 px-3 cursor-pointer hover:bg-cyan-100 dark:hover:bg-cyan-950/60'>
+        <div onClick={handleClick} className='w-full flex gap-4 items-center py-2 px-3 cursor-pointer hover:bg-cyan-100 dark:hover:bg-cyan-950/60'>
             {
                 friend.profileImg ?
-                    <div>Img</div>
+                    <Avatar imgLink={friend.profileImg} />
                     :
                     <Avatar username={friend.username} />
             }

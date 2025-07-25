@@ -60,7 +60,19 @@ const Sidebar: FC<SidebarProps> = ({ }) => {
                     <SideLink to="/dashboard/tasks" icon={<ClipboardPenLine size={20} />} text='Add Task' />
                 </div>
             </div>
-            <div className='pb-5'>
+            <div className='pb-5 flex flex-col gap-5 justify-center items-center'>
+                <Button variant={'outline'} className='size-8 rounded-full'
+                    onClick={() => {
+                        theme === "dark" ?
+                            setTheme('light') : setTheme("dark")
+                    }}>
+                    {
+                        theme === "dark" ?
+                            <Moon size={5} className="" />
+                            :
+                            <Sun size={5} className="" />
+                    }
+                </Button>
                 {
                     isLoading ?
                         <Skeleton className='rounded-full size-10' />
@@ -69,29 +81,13 @@ const Sidebar: FC<SidebarProps> = ({ }) => {
                             <PopoverTrigger >
                                 <Avatar username={data?.user.username!} />
                             </PopoverTrigger>
-                            <PopoverContent className='py-2 px-3 max-w-[200px] font-medium'>
+                            <PopoverContent className='py-2 px-3 w-fit font-medium'>
                                 <div>
                                     <div>
                                         {data?.user.username}
                                     </div>
                                     <div className='text-foreground/80 font-light'>
                                         {data?.user.email}
-                                    </div>
-                                    <Separator className='my-2' />
-                                    <div className='text-foreground/80 flex justify-between items-center'>
-                                        <p className='text-foreground/80 text-sm'>Theme</p>
-                                        <Button variant={'outline'} className='size-7'
-                                            onClick={() => {
-                                                theme === "dark" ?
-                                                    setTheme('light') : setTheme("dark")
-                                            }}>
-                                            {
-                                                theme === "dark" ?
-                                                    <Moon size={5} className="" />
-                                                    :
-                                                    <Sun size={5} className="" />
-                                            }
-                                        </Button>
                                     </div>
                                 </div>
                                 <Separator className='my-2' />

@@ -21,13 +21,13 @@ import { CalendarIcon } from 'lucide-react'
 import { format } from 'date-fns'
 import { Calendar } from '@/components/ui/calendar'
 
-interface MilestoneProps {
+interface MilestoneCompProps {
 
 }
 
 type FormData = z.infer<typeof addMilestone>
 
-const Milestone: FC<MilestoneProps> = ({ }) => {
+const MilestoneComp: FC<MilestoneCompProps> = ({ }) => {
     const { userId } = useAuth()
     const [dialogOpen, setDialogOpen] = useState(false)
     const { data, isLoading } = useQuery({
@@ -52,8 +52,6 @@ const Milestone: FC<MilestoneProps> = ({ }) => {
     } = useForm<FormData>({
         resolver: zodResolver(addMilestone),
     });
-
-    console.log(errors)
 
     const addMilestoneFn = useMutation({
         mutationFn: (data: FormData) => axios.post(`${import.meta.env.VITE_HTTP_URL}milestone/create`, {
@@ -230,4 +228,4 @@ const Milestone: FC<MilestoneProps> = ({ }) => {
     )
 }
 
-export default Milestone
+export default MilestoneComp

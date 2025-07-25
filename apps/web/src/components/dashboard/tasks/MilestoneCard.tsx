@@ -8,10 +8,11 @@ import { toast } from 'sonner';
 
 interface MilestoneCardProps {
     milestone: Milestone
-    handleDeleteMilestone: (id: string) => void;
+    handleDeleteMilestone?: (id: string) => void;
+    isFriendCard?: boolean
 }
 
-const MilestoneCard: FC<MilestoneCardProps> = ({ handleDeleteMilestone, milestone }) => {
+const MilestoneCard: FC<MilestoneCardProps> = ({ handleDeleteMilestone, milestone, isFriendCard }) => {
     const [isDoneState, setIsDoneState] = useState<boolean>(milestone.isDone)
 
     const queryClient = useQueryClient()
@@ -35,7 +36,7 @@ const MilestoneCard: FC<MilestoneCardProps> = ({ handleDeleteMilestone, mileston
     return (
         <div className='flex group items-center mb-3 justify-center gap-3' >
             <div
-                onClick={() => !isDoneState && completeMilestoneMutation.mutate()}
+                onClick={() => !isFriendCard && !isDoneState && completeMilestoneMutation.mutate()}
                 className={`flex flex-1 items-center px-3 py-2 bg-gradient-to-r from-cyan-200 dark:from-cyan-900 to-transparent rounded-lg cursor-pointer transition duration-300 ring-2 ring-transparent group-hover:ring-action`}
             >
                 {
@@ -55,9 +56,12 @@ const MilestoneCard: FC<MilestoneCardProps> = ({ handleDeleteMilestone, mileston
                 </div>
                 <p className=' text-sm'>{new Date(milestone.deadline).toDateString()}</p>
             </div>
-            <Button onClick={() => handleDeleteMilestone(milestone.id)} variant={'outline'} size={'icon'} className='p-3 rounded-lg group cursor-pointer hover:text-red-600'>
-                <Trash2 size={25} className='' />
-            </Button>
+            {
+                handleDeleteMilestone &&
+                <Button onClick={() => handleDeleteMilestone(milestone.id)} variant={'outline'} size={'icon'} className='p-3 rounded-lg group cursor-pointer hover:text-red-600'>
+                    <Trash2 size={25} className='' />
+                </Button>
+            }
         </div>
     )
 }

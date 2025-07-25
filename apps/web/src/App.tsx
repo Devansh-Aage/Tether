@@ -8,6 +8,7 @@ import SignUp from './page/auth/SignUp'
 import ProtectedRoute from './components/ProtectedRoute'
 import AddFriendPage from './page/protected/AddFriendPage'
 import Tasks from './page/protected/Tasks'
+import FriendChat from './page/protected/FriendChat'
 
 function App() {
 
@@ -28,6 +29,7 @@ function App() {
           <Route path='dashboard' element={<Dashboard />} >
             <Route path='add-friend' element={<AddFriendPage />} />
             <Route path='tasks' element={<Tasks />} />
+            <Route path='chat/:friendshipId' element={<FriendChat />} />
           </Route>
         </Route>
 

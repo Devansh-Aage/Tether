@@ -23,7 +23,9 @@ export const getFriends: RequestHandler = async (req, res) => {
       return;
     }
     const rawFriends = friendships.map((f) =>
-      f.userAId === userId ? f.userB : f.userA
+      f.userAId === userId
+        ? { ...f.userB, friendshipId: f.id }
+        : { ...f.userA, friendshipId: f.id }
     );
     const sensitiveFields = [
       "password",

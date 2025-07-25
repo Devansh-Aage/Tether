@@ -8,6 +8,7 @@ export interface Friend {
   profileImg: string | null;
   pubKey: string | null;
   createdAt: Date;
+  friendshipId: string;
 }
 
 export interface FriendRequest {

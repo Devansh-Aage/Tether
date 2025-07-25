@@ -1,5 +1,5 @@
 import DailyTask from '@/components/dashboard/tasks/DailyTask'
-import Milestone from '@/components/dashboard/tasks/Milestone'
+import MilestoneComp from '@/components/dashboard/tasks/Milestone'
 import useTitle from '@/hooks/useTitle'
 import { type FC } from 'react'
 
@@ -12,7 +12,7 @@ const Tasks: FC<TasksProps> = ({ }) => {
     return (
         <div className='flex-1 p-5'>
             <DailyTask />
-            <Milestone />
+            <MilestoneComp />
         </div>
     )
 }
