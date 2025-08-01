@@ -218,7 +218,11 @@ importers:
         specifier: ^4.8.1
         version: 4.8.1
 
-  packages/common: {}
+  packages/common:
+    dependencies:
+      '@tether/db':
+        specifier: workspace:^1.0.0
+        version: link:../db
 
   packages/db:
     dependencies:

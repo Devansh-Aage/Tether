@@ -99,3 +99,68 @@ export const getFriendReq: RequestHandler = async (req, res) => {
     });
   }
 };
+
+export const getMessagesFromChat: RequestHandler = async (req, res) => {
+  try {
+    const { friendshipId } = req.params;
+    if (!friendshipId) {
+      res.status(400).json({ message: "Invalid Params!" });
+      return;
+    }
+    const userId = req.userId;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized!" });
+      return;
+    }
+    const friendship = await prisma.friendship.findFirst({
+      where: {
+        id: friendshipId,
+      },
+      include: {
+        messages: true,
+        userA: true,
+        userB: true,
+      },
+    });
+    if (!friendship) {
+      res.status(400).json({ message: "Invalid Payload!" });
+      return;
+    }
+    const rawUser =
+      friendship.userA.id === userId ? friendship.userA : friendship.userB;
+    const rawFriend =
+      rawUser.id === friendship.userA.id ? friendship.userB : friendship.userA;
+    const sensitiveFields = [
+      "password",
+      "googleRefreshToken",
+      "googleId",
+      "authProvider",
+      "updatedAt",
+    ];
+    const friend = Object.fromEntries(
+      Object.entries(rawFriend).filter(
+        ([key]) => !sensitiveFields.includes(key)
+      )
+    );
+    const user = Object.fromEntries(
+      Object.entries(rawUser).filter(([key]) => !sensitiveFields.includes(key))
+    );
+    const friendsId = [friendship.userAId, friendship.userBId];
+    const isFriendshipValid = friendsId.includes(userId);
+    if (!isFriendshipValid) {
+      res.status(401).json({ message: "Unauthorized!" });
+      return;
+    }
+    const messages = friendship.messages.sort(
+      (m, n) =>
+        new Date(n.timestamp).getTime() - new Date(m.timestamp).getTime()
+    );
+    res.status(200).json({ messages, user, friend });
+  } catch (error) {
+    console.error("Error occurred during fetching chat messages:", error);
+    res.status(500).json({
+      message: "Error fetching chat messages",
+      error: process.env.NODE_ENV !== "production" ? error : undefined,
+    });
+  }
+};

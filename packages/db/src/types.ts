@@ -1,5 +1,5 @@
-import { User, FriendReq, Task, Milestone } from "@prisma/client";
-export type { User, FriendReq, Task, Milestone };
+import { User, FriendReq, Task, Milestone, Message } from "@prisma/client";
+export type { User, FriendReq, Task, Milestone, Message };
 
 export interface Friend {
   id: string;
@@ -9,6 +9,15 @@ export interface Friend {
   pubKey: string | null;
   createdAt: Date;
   friendshipId: string;
+}
+
+export interface UserData {
+  id: string;
+  email: string;
+  username: string;
+  profileImg: string | null;
+  pubKey: string | null;
+  createdAt: Date;
 }
 
 export interface FriendRequest {

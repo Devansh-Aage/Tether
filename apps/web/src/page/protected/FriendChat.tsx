@@ -3,6 +3,7 @@ import FriendMilestones from '@/components/dashboard/friend-chat/FriendMilestone
 import FriendTasks from '@/components/dashboard/friend-chat/FriendTasks';
 import { type FC } from 'react'
 import { useLocation, useParams } from 'react-router'
+import FriendMsgs from '../../components/dashboard/friend-chat/FriendMsgs';
 
 interface FriendChatProps {
 
@@ -26,6 +27,7 @@ const FriendChat: FC<FriendChatProps> = ({ }) => {
                     }
                     <p>{friendName}</p>
                 </div>
+                <FriendMsgs friendshipId={friendshipId!} />
             </div>
             <div className='w-sm py-4 px-2 flex flex-col gap-3 '>
                 <FriendTasks friendId={friendId} />
