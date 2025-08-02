@@ -1,36 +1,40 @@
-import type { Friend } from '@tether/db/src/types'
+import Avatar from '@/components/avatar'
+import type { Group } from '@tether/db/src/types'
 import { type FC } from 'react'
-import Avatar from '../avatar'
 import { useLocation, useNavigate } from 'react-router'
 
-
-interface FriendCardProps {
-    friend: Friend
+interface GroupCardProps {
+    group: Group
 }
 
-const FriendCard: FC<FriendCardProps> = ({ friend }) => {
+const GroupCard: FC<GroupCardProps> = ({ group }) => {
     const navigate = useNavigate()
     const handleClick = () => {
-        navigate(`chat/${friend.friendshipId}`, { state: { friendImg: friend.profileImg, friendName: friend.username, friendId: friend.id } })
+        navigate(`grp-chat/${group.id}`, {
+            state: {
+                grpName: group.name,
+                grpImg: group.groupImg,
+                grpCreatorId: group.creatorId
+            }
+        })
     }
     const location = useLocation();
     const pathname = location.pathname.split('/');
-    const isActive = pathname.includes(friend.friendshipId)
-
+    const isActive = pathname.includes(group.id)
     return (
         <div onClick={handleClick} className={`w-full flex gap-4 items-center py-2 px-3 cursor-pointer  ${isActive ? "dark:bg-cyan-800/50 bg-cyan-200" : "hover:bg-cyan-100 dark:hover:bg-cyan-950/60"}`}>
             {
-                friend.profileImg ?
-                    <Avatar className='size-9' imgLink={friend.profileImg} />
+                group.groupImg ?
+                    <Avatar className='size-9' imgLink={group.groupImg} />
                     :
-                    <Avatar className='size-9' username={friend.username} />
+                    <Avatar className='size-9' username={group.name} />
             }
             <div className='flex-1 min-w-0'>
-                <p className='font-semibold'>{friend.username}</p>
+                <p className='font-semibold'>{group.name}</p>
                 {/* <p className='text-sm truncate'>Last text:shshhsh Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro, in fugiat numquam alias possimus molestias? Natus expedita aspernatur maxime odit?</p> */}
             </div>
         </div>
     )
 }
 
-export default FriendCard
+export default GroupCard

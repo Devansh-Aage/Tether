@@ -1,38 +1,24 @@
-import { useEffect, useState, type FC } from 'react'
-import FriendCard from './FriendCard'
 import { useAuth } from '@/context/AuthContext'
-import { useQueryClient } from '@tanstack/react-query';
-import { Skeleton } from '../ui/skeleton';
-import type { Friend } from '@tether/db/src/types';
-import socket from '@/lib/socket';
-import { NEW_FRIEND } from '@tether/common/src/eventConstants';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils'
+import { useQueryClient } from '@tanstack/react-query'
+import type { Group } from '@tether/db/src/types'
+import { useState, type FC } from 'react'
+import { Skeleton } from './ui/skeleton'
+import GroupCard from './dashboard/group/GroupCard'
 
-
-interface FriendsListProps {
-    friends: Friend[]
+interface GroupListProps {
+    groups: Group[]
     isLoading: boolean
 }
 
-const FriendsList: FC<FriendsListProps> = ({ friends, isLoading }) => {
+const GroupList: FC<GroupListProps> = ({ groups, isLoading }) => {
     const queryClient = useQueryClient()
     const { isAuthLoading } = useAuth();
     const [input, setInput] = useState("")
-
-    useEffect(() => {
-        const incomingFrndReqHandler = (_newfrnd: Friend) => {
-            queryClient.invalidateQueries({ queryKey: ["userFriends"] });
-        }
-        socket.on(NEW_FRIEND, incomingFrndReqHandler)
-        return (() => {
-            socket.off(NEW_FRIEND, incomingFrndReqHandler)
-        })
-    }, [])
-
-    const filteredChats = friends?.filter((friend) =>
-        friend.username.toLowerCase().includes(input.toLowerCase())
+    const filteredChats = groups?.filter((group) =>
+        group.name.toLowerCase().includes(input.toLowerCase())
     );
-    
+
     return (
         <div className='w-full'>
             <input value={input} onChange={(e) => setInput(e.target.value)} type="text" placeholder='Search' className={cn(
@@ -42,21 +28,21 @@ const FriendsList: FC<FriendsListProps> = ({ friends, isLoading }) => {
             )} />
             {
                 isAuthLoading || isLoading ?
-                    Array.from({ length: 7 }).map((_, i) => (
+                    Array.from({ length: 3 }).map((_, i) => (
                         <Skeleton key={i} className='w-full h-14 mb-1 bg-foreground/20 ' />
                     ))
                     :
                     filteredChats &&
                         filteredChats.length > 0 ?
-                        filteredChats.map((friend) => (
-                            <FriendCard friend={friend} key={friend.email} />
+                        filteredChats.map((group) => (
+                            <GroupCard group={group} key={group.id} />
                         ))
                         :
-                        <p className='ml-4 mt-4'>Friend list is empty</p>
+                        <p className='ml-4 mt-4'>Group list is empty</p>
 
             }
         </div>
     )
 }
 
-export default FriendsList
+export default GroupList

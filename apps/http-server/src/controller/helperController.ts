@@ -164,3 +164,43 @@ export const getMessagesFromChat: RequestHandler = async (req, res) => {
     });
   }
 };
+
+export const getGroups: RequestHandler = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized!" });
+      return;
+    }
+
+    const userWithGrpMemberships = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        groupMemberships: true,
+      },
+    });
+    if (userWithGrpMemberships?.groupMemberships.length == 0) {
+      res.status(200).json({ groups: [] });
+      return;
+    }
+    const grpIds = userWithGrpMemberships?.groupMemberships.map(
+      (i) => i.groupId
+    );
+    const groups = await prisma.group.findMany({
+      where: {
+        id: {
+          in: grpIds,
+        },
+      },
+    });
+    res.status(200).json({ groups: groups });
+  } catch (error) {
+    console.error("Error occurred during fetching groups:", error);
+    res.status(500).json({
+      message: "Error fetching groups",
+      error: process.env.NODE_ENV !== "production" ? error : undefined,
+    });
+  }
+};

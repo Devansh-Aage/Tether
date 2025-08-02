@@ -16,8 +16,6 @@ interface FriendChatInputProps {
     friendshipId: string;
 }
 
-
-
 const sendMsgValidation = z.object({
     text: z.string().min(1, "Message can't be null")
 })

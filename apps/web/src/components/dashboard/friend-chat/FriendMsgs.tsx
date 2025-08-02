@@ -12,7 +12,6 @@ interface FriendMsgsProps {
     friendshipId: string
 }
 
-
 const formatTimeStamp = (timeStamp: Date) => {
     return format(timeStamp, "HH:mm");
 };

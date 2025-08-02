@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import AddFriendPage from './page/protected/AddFriendPage'
 import Tasks from './page/protected/Tasks'
 import FriendChat from './page/protected/FriendChat'
+import GroupChat from './page/protected/GroupChat'
 
 function App() {
 
@@ -30,6 +31,7 @@ function App() {
             <Route path='add-friend' element={<AddFriendPage />} />
             <Route path='tasks' element={<Tasks />} />
             <Route path='chat/:friendshipId' element={<FriendChat />} />
+            <Route path='grp-chat/:groupId' element={<GroupChat />} />
           </Route>
         </Route>
 

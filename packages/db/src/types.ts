@@ -1,5 +1,12 @@
-import { User, FriendReq, Task, Milestone, Message } from "@prisma/client";
-export type { User, FriendReq, Task, Milestone, Message };
+import {
+  User,
+  FriendReq,
+  Task,
+  Milestone,
+  Message,
+  Group,
+} from "@prisma/client";
+export type { User, FriendReq, Task, Milestone, Message, Group };
 
 export interface Friend {
   id: string;
@@ -32,7 +39,7 @@ export interface FriendRequest {
 }
 
 export interface ChatData {
-    messages: Message[],
-    friend: UserData,
-    user: UserData
+  messages: Message[];
+  friend: UserData;
+  user: UserData;
 }
