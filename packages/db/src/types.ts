@@ -30,3 +30,9 @@ export interface FriendRequest {
   senderUsername: string;
   senderPubkey: string;
 }
+
+export interface ChatData {
+    messages: Message[],
+    friend: UserData,
+    user: UserData
+}

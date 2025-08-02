@@ -18,6 +18,7 @@ const AddFriend: FC<AddFriendProps> = ({ }) => {
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors },
     } = useForm<FormData>({
         resolver: zodResolver(sendFriendReq),
@@ -35,7 +36,9 @@ const AddFriend: FC<AddFriendProps> = ({ }) => {
     }, [])
 
     const onSubmit = (data: FormData) => {
+        reset()
         socket.emit(ADD_FRIEND, { receiverEmail: data.receiverEmail })
+
     }
 
     return (

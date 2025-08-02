@@ -76,7 +76,7 @@ const MilestoneComp: FC<MilestoneCompProps> = ({ }) => {
                     milestones: [
                         ...previousMilestones.milestones,
                         {
-                            id: "323sdsds",
+                            id: "temp-" + Date.now(),
                             title: data.title,
                             isDone: false,
                             userId: userId ?? "3g3g3g33",
@@ -167,11 +167,11 @@ const MilestoneComp: FC<MilestoneCompProps> = ({ }) => {
                         ))
                         :
                         data?.milestones && data?.milestones.length > 0 ?
-                        data?.milestones.map((milestone) => (
-                            <MilestoneCard key={milestone.id} milestone={milestone} handleDeleteMilestone={deleteMilestoneMutation.mutate} />
-                        ))
-                        :
-                        <p>No milestones added yet.</p>
+                            data?.milestones.map((milestone) => (
+                                <MilestoneCard key={milestone.id} milestone={milestone} handleDeleteMilestone={deleteMilestoneMutation.mutate} />
+                            ))
+                            :
+                            <p>No milestones added yet.</p>
                     }
                 </div>
             </ScrollArea>

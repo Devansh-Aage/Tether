@@ -15,7 +15,7 @@ import { addTask } from '@tether/common/src/zodHttpSchemas'
 import { useAuth } from '@/context/AuthContext'
 import { toast } from 'sonner'
 
-interface DailyTaskProps {}
+interface DailyTaskProps { }
 
 type FormData = z.infer<typeof addTask>
 
@@ -64,7 +64,7 @@ const DailyTask: FC<DailyTaskProps> = ({ }) => {
                     tasks: [
                         ...previousTasks.tasks,
                         {
-                            id: "323sdsds",
+                            id: "temp-" + Date.now(),
                             title: newTaskTitle,
                             isDone: false,
                             userId: userId ?? "3g3g3g33"

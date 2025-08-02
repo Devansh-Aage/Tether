@@ -7,6 +7,39 @@
   box-sizing: border-box;
 }
 
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #c1efff;
+    border-radius: 10px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  /* Dark mode variants */
+  .dark .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #374151;
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #495261;
+  }
+}
+
 @theme inline {
   --color-dark-bg: oklch(0.244 0.013 205.528);
   --color-light-bg: oklch(0.968 0.015 184.66);

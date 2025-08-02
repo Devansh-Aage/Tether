@@ -43,7 +43,7 @@ const FriendsList: FC<FriendsListProps> = ({ }) => {
         friend.username.toLowerCase().includes(input.toLowerCase())
     );
     return (
-        <div className='w-xs h-full bg-light-bg dark:bg-dark-bg font-nunito'>
+        <div className='w-[280px] h-full bg-light-bg dark:bg-dark-bg font-nunito'>
             <p className='text-xl font-semibold ml-4 mt-2'>Chats</p>
             <input value={input} onChange={(e) => setInput(e.target.value)} type="text" placeholder='Search' className='bg-inputBg rounded-md py-1 px-2 my-3 ml-3 border dark:border-white border-black focus:border-transparent ring-transparent ring-2 focus:ring-action w-[90%] mx-auto text-sm' />
             {
