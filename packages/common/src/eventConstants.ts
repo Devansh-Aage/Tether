@@ -21,6 +21,9 @@ export const CREATE_GROUP_RES = "create_grp_res";
 export const ADD_IN_GROUP_REQ = "add_in_grp_req";
 export const ADD_IN_GROUP_RES = "add_in_grp_res";
 
+export const ADDED_IN_GROUP = "added_in_grp";
+export const REMOVED_FROM_GROUP = "removed_from_grp";
+
 export const REMOVE_FROM_GROUP_REQ = "remove_from_grp_req";
 export const REMOVE_FROM_GROUP_RES = "remove_from_grp_res";
 

@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import { Socket } from "socket.io";
 import { sendMsgInGroupSchema } from "@tether/common/src/zodWsSchemas";
 import {
-  GOT_NEW_MSG,
   GOT_NEW_MSG_GRP,
   SEND_MSG_GRP_RES,
 } from "@tether/common/src/eventConstants";

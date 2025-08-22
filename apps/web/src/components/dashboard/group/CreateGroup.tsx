@@ -75,10 +75,7 @@ const CreateGroup: FC<CreateGroupProps> = ({ friends }) => {
 
     setTimeout(() => {
       queryClient.invalidateQueries({ queryKey: ["userGroups"] })
-
     }, 1500);
-
-
   }
   return (
     <div>

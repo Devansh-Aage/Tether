@@ -1,5 +1,5 @@
 import { prisma } from "@tether/db/src";
-import { RequestHandler } from "express";
+import { RequestHandler, Request, Response } from "express";
 
 export const getFriends: RequestHandler = async (req, res) => {
   try {
@@ -14,30 +14,36 @@ export const getFriends: RequestHandler = async (req, res) => {
         OR: [{ userAId: userId }, { userBId: userId }],
       },
       include: {
-        userA: true,
-        userB: true,
+        userA: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            profileImg: true,
+            pubKey: true,
+            createdAt: true,
+          },
+        },
+        userB: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            profileImg: true,
+            pubKey: true,
+            createdAt: true,
+          },
+        },
       },
     });
     if (friendships.length == 0) {
       res.status(200).json({ friends: [] });
       return;
     }
-    const rawFriends = friendships.map((f) =>
+    const friends = friendships.map((f) =>
       f.userAId === userId
         ? { ...f.userB, friendshipId: f.id }
         : { ...f.userA, friendshipId: f.id }
-    );
-    const sensitiveFields = [
-      "password",
-      "googleRefreshToken",
-      "googleId",
-      "authProvider",
-      "updatedAt",
-    ];
-    const friends = rawFriends.map((rF) =>
-      Object.fromEntries(
-        Object.entries(rF).filter(([key]) => !sensitiveFields.includes(key))
-      )
     );
     res.status(200).json({ friends });
   } catch (error) {
@@ -100,7 +106,12 @@ export const getFriendReq: RequestHandler = async (req, res) => {
   }
 };
 
-export const getMessagesFromChat: RequestHandler = async (req, res) => {
+export const getMessagesFromChat: RequestHandler<
+  { friendshipId: string },
+  any,
+  any,
+  GetMsgsQuery
+> = async (req, res) => {
   try {
     const { friendshipId } = req.params;
     if (!friendshipId) {
@@ -112,50 +123,94 @@ export const getMessagesFromChat: RequestHandler = async (req, res) => {
       res.status(401).json({ message: "Unauthorized!" });
       return;
     }
+    const { cursor, limit } = req.query;
+    if (!limit) {
+      res.status(400).json({ message: "Invalid Query Params!" });
+      return;
+    }
     const friendship = await prisma.friendship.findFirst({
       where: {
         id: friendshipId,
       },
       include: {
-        messages: true,
-        userA: true,
-        userB: true,
+        userA: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            profileImg: true,
+            pubKey: true,
+            createdAt: true,
+          },
+        },
+        userB: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            profileImg: true,
+            pubKey: true,
+            createdAt: true,
+          },
+        },
       },
     });
     if (!friendship) {
       res.status(400).json({ message: "Invalid Payload!" });
       return;
     }
-    const rawUser =
-      friendship.userA.id === userId ? friendship.userA : friendship.userB;
-    const rawFriend =
-      rawUser.id === friendship.userA.id ? friendship.userB : friendship.userA;
-    const sensitiveFields = [
-      "password",
-      "googleRefreshToken",
-      "googleId",
-      "authProvider",
-      "updatedAt",
-    ];
-    const friend = Object.fromEntries(
-      Object.entries(rawFriend).filter(
-        ([key]) => !sensitiveFields.includes(key)
-      )
-    );
-    const user = Object.fromEntries(
-      Object.entries(rawUser).filter(([key]) => !sensitiveFields.includes(key))
-    );
+
     const friendsId = [friendship.userAId, friendship.userBId];
     const isFriendshipValid = friendsId.includes(userId);
     if (!isFriendshipValid) {
       res.status(401).json({ message: "Unauthorized!" });
       return;
     }
-    const messages = friendship.messages.sort(
-      (m, n) =>
-        new Date(n.timestamp).getTime() - new Date(m.timestamp).getTime()
-    );
-    res.status(200).json({ messages, user, friend });
+
+    const user =
+      friendship.userAId === userId ? friendship.userA : friendship.userB;
+    const friend =
+      friendship.userBId === userId ? friendship.userB : friendship.userA;
+
+    // Fix: Add validation for limit parsing
+    const parsedLimit = parseInt(limit as string, 10);
+    if (isNaN(parsedLimit) || parsedLimit <= 0) {
+      res.status(400).json({ message: "Invalid limit parameter!" });
+      return;
+    }
+
+    const take = parsedLimit;
+
+    const messages = await prisma.message.findMany({
+      where: {
+        friendshipId: friendshipId,
+      },
+      orderBy: {
+        timestamp: "desc",
+      },
+      take: take + 1,
+      ...(cursor
+        ? {
+            cursor: {
+              id: cursor,
+            },
+            skip: 1,
+          }
+        : {}),
+    });
+
+    const hasMore = messages.length > take;
+    if (hasMore) messages.pop();
+
+    const lastEntryId =
+      messages.length > 0 ? messages[messages.length - 1].id : null;
+
+    res.status(200).json({
+      messages,
+      nextCursor: hasMore ? lastEntryId : null,
+      sender: user,
+      friend: friend,
+    });
   } catch (error) {
     console.error("Error occurred during fetching chat messages:", error);
     res.status(500).json({
@@ -200,6 +255,165 @@ export const getGroups: RequestHandler = async (req, res) => {
     console.error("Error occurred during fetching groups:", error);
     res.status(500).json({
       message: "Error fetching groups",
+      error: process.env.NODE_ENV !== "production" ? error : undefined,
+    });
+  }
+};
+
+export const getGroupData: RequestHandler = async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const userId = req.userId;
+
+    if (!groupId) {
+      res.status(400).json({ message: "Invalid Params!" });
+      return;
+    }
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized!" });
+      return;
+    }
+
+    const groupData = await prisma.group.findFirst({
+      where: { id: groupId },
+      include: {
+        creator: { select: { id: true } },
+        groupMemberships: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                email: true,
+                profileImg: true,
+                pubKey: true,
+                createdAt: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!groupData) {
+      res.status(400).json({ message: "Invalid Group ID!" });
+      return;
+    }
+
+    // ✅ Membership check
+    const isUserMember = groupData.groupMemberships.some(
+      (m) => m.userId === userId
+    );
+    if (!isUserMember) {
+      res.status(401).json({ message: "Unauthorized!" });
+      return;
+    }
+    // ✅ Map members with admin & creator flags
+    const members = groupData.groupMemberships.map((m) => ({
+      ...m.user,
+      isAdmin: m.isAdmin,
+      isCreator: m.userId === groupData.creatorId,
+    }));
+
+    res.status(200).json({
+      group: {
+        grpName: groupData.name,
+        grpImg: groupData.groupImg,
+      },
+      members,
+    });
+  } catch (error) {
+    console.error("Error fetching group data:", error);
+    res.status(500).json({
+      message: "Error fetching group data",
+      error: process.env.NODE_ENV !== "production" ? error : undefined,
+    });
+  }
+};
+
+type GetMsgsQuery = {
+  cursor?: string;
+  limit?: string;
+};
+
+export const getGroupMsgs: RequestHandler<
+  { groupId: string },
+  any,
+  any,
+  GetMsgsQuery
+> = async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const userId = req.userId;
+
+    if (!groupId) {
+      res.status(400).json({ message: "Invalid Params!" });
+      return;
+    }
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized!" });
+      return;
+    }
+    const { cursor, limit } = req.query;
+
+    if (!limit) {
+      res.status(400).json({ message: "Invalid Query Params!" });
+      return;
+    }
+
+    const grpMembership = await prisma.groupMembership.findFirst({
+      where: {
+        groupId: groupId,
+        userId: userId,
+      },
+    });
+
+    if (!grpMembership) {
+      res.status(401).json({ message: "Not a Group Member!" });
+      return;
+    }
+
+    // Fix: Add validation for limit parsing
+    const parsedLimit = parseInt(limit as string, 10);
+    if (isNaN(parsedLimit) || parsedLimit <= 0) {
+      res.status(400).json({ message: "Invalid limit parameter!" });
+      return;
+    }
+
+    const take = parsedLimit;
+
+    const grpMsgs = await prisma.groupMessage.findMany({
+      where: {
+        groupId: groupId,
+      },
+      orderBy: {
+        timestamp: "desc",
+      },
+      take: take + 1,
+      ...(cursor
+        ? {
+            cursor: {
+              id: cursor,
+            },
+            skip: 1,
+          }
+        : {}),
+    });
+
+    const hasMore = grpMsgs.length > take;
+    if (hasMore) grpMsgs.pop();
+
+    const lastEntryId =
+      grpMsgs.length > 0 ? grpMsgs[grpMsgs.length - 1].id : null;
+
+    res.status(200).json({
+      messages: grpMsgs,
+      nextCursor: hasMore ? lastEntryId : null,
+    });
+  } catch (error) {
+    console.error("Error fetching group messages:", error);
+    res.status(500).json({
+      message: "Error fetching group messages",
       error: process.env.NODE_ENV !== "production" ? error : undefined,
     });
   }

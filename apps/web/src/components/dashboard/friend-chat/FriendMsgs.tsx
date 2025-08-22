@@ -1,7 +1,7 @@
 import { useAuth } from '@/context/AuthContext'
 import { cn } from '@/lib/utils'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import type { ChatData, Message, UserData } from '@tether/db/src/types'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import type { ChatApiData, ChatData, Message, UserData } from '@tether/db/src/types'
 import axios from 'axios'
 import { format } from 'date-fns'
 import { useEffect, useRef, type FC } from 'react'
@@ -12,6 +12,8 @@ interface FriendMsgsProps {
     friendshipId: string
 }
 
+const MESSAGE_LIMIT = 200
+
 const formatTimeStamp = (timeStamp: Date) => {
     return format(timeStamp, "HH:mm");
 };
@@ -20,35 +22,80 @@ const FriendMsgs: FC<FriendMsgsProps> = ({ friendshipId }) => {
     const queryClient = useQueryClient()
     const { userId } = useAuth()
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const { data, isLoading, isSuccess } = useQuery({
-        queryKey: [friendshipId, "chats"],
-        queryFn: async (): Promise<{ chatData: ChatData }> => {
-            const res = await axios.get(`${import.meta.env.VITE_HTTP_URL}helper/frnd-chats/${friendshipId}`, {
-                withCredentials: true
-            })
-            return { chatData: res.data }
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    const fetchMessages = async ({ pageParam }: { pageParam?: unknown }) => {
+        const res = await axios.get(
+            `${import.meta.env.VITE_HTTP_URL}helper/frnd-chats/${friendshipId}`,
+            {
+                params: {
+                    cursor: pageParam,
+                    limit: MESSAGE_LIMIT,
+                },
+                withCredentials: true,
+            }
+        );
+        return res.data;
+    };
+
+    const {
+        data,
+        isFetching,
+        isSuccess,
+        isFetchingNextPage,
+        hasNextPage,
+        fetchNextPage,
+        isError,
+        isLoading,
+    } = useInfiniteQuery<ChatApiData, Error>({
+        queryKey: [friendshipId, "chats",],
+        queryFn: ({ pageParam }) => {
+            return fetchMessages({ pageParam });
         },
-    })
+        initialPageParam: undefined,
+        getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
+    });
+
+    const handleScroll = () => {
+        if (
+            containerRef.current &&
+            containerRef.current.scrollTop <= 0 &&
+            hasNextPage &&
+            !isFetching &&
+            !isFetchingNextPage
+        ) {
+            fetchNextPage();
+        }
+    };
 
     useEffect(() => {
         const incomingFrndMsgHandler = (newMsg: Message) => {
-            queryClient.setQueryData<{ chatData: ChatData }>(
+            queryClient.setQueryData<ChatData>(
                 [friendshipId, "chats"],
                 (old) => {
-                    if (!old) {
+                    if (old) {
                         return {
-                            chatData: {
-                                messages: [newMsg],
-                                friend: {} as UserData,
-                                user: {} as UserData
-                            }
+                            ...old,
+                            pages: old.pages.map((page, idx) =>
+                                idx === 0
+                                    ? {
+                                        ...page,
+                                        messages: [newMsg, ...page.messages],
+                                    }
+                                    : page
+                            ),
                         }
                     }
                     return {
-                        chatData: {
-                            ...old?.chatData,
-                            messages: [newMsg, ...old.chatData.messages]
-                        }
+                        pageParams: [undefined],
+                        pages: [
+                            {
+                                messages: [newMsg],
+                                friend: {} as UserData,
+                                user: {} as UserData,
+                                nextCursor: null
+                            }
+                        ]
                     }
                 }
             );
@@ -59,26 +106,34 @@ const FriendMsgs: FC<FriendMsgsProps> = ({ friendshipId }) => {
         })
     }, [])
 
+    const messages = data?.pages.flatMap((messages) => messages.messages) ?? []
+
     useEffect(() => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ "behavior": "smooth" })
         }
-    }, [data?.chatData.messages.length])
+    }, [])
 
 
     if (isLoading) {
         return <p>Loading...</p>
     }
+    if (isError) {
+        return <p>Error loading messages</p>;
+    }
+
     return (
         <div
-            className="flex flex-col-reverse p-2 flex-1 w-full h-screen overflow-y-auto scrollbar-thin"
+            ref={containerRef}
+            onScroll={handleScroll}
+            className="flex flex-col-reverse p-2 flex-1 w-full h-screen overflow-y-auto scrollbar-thin z-0 overflow-x-clip"
         >
             <div ref={messagesEndRef} />
-            {isSuccess && data.chatData.messages.length > 0 ?
-                data.chatData.messages.map((message, index) => {
+            {isSuccess && messages.length > 0 ?
+                messages.map((message, index) => {
                     const isCurrentUser = message.senderId === userId;
                     const hasNextMessageFromSameUser =
-                        data.chatData.messages[index - 1]?.senderId === data.chatData.messages[index].senderId;
+                        messages[index - 1]?.senderId === messages[index].senderId;
                     return (
                         <div
                             key={`${message.id}`}
@@ -87,7 +142,7 @@ const FriendMsgs: FC<FriendMsgsProps> = ({ friendshipId }) => {
                             })}
                         >
                             <div
-                                className={cn("flex space-y-2 max-w-xs mx-2 px-3 py-2 rounded-lg my-[2px]",
+                                className={cn("flex space-y-2 max-w-lg mx-2 px-3 py-2 rounded-lg my-[2px] break-words relative pr-5 pb-4",
                                     {
                                         "dark:bg-cyan-800 bg-cyan-400 ": isCurrentUser,
                                         "dark:bg-gray-800 bg-slate-200 ": !isCurrentUser,
@@ -99,7 +154,7 @@ const FriendMsgs: FC<FriendMsgsProps> = ({ friendshipId }) => {
                                 )}
                             >
                                 {message.text}{" "}
-                                <span className="ml-2 text-right self-end text-[11px] dark:text-slate-300 text-gray-800">
+                                <span className="ml-2 absolute bottom-0.5 right-1.5 text-[10px] dark:text-slate-300 text-gray-800">
                                     {formatTimeStamp(message.timestamp)}
                                 </span>
                             </div>

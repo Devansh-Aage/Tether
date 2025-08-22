@@ -1,17 +1,20 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Friend, Group } from '@tether/db/src/types'
 import axios from 'axios'
-import { type FC } from 'react'
+import { useEffect, type FC } from 'react'
 import CreateGroup from './dashboard/group/CreateGroup'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import FriendsList from './dashboard/FriendsList'
 import GroupList from './GroupList'
+import socket from '@/lib/socket'
+import { ADDED_IN_GROUP, NEW_FRIEND, REMOVED_FROM_GROUP } from '@tether/common/src/eventConstants'
 
 interface ChatListProps {
 
 }
 
 const ChatList: FC<ChatListProps> = ({ }) => {
+    const queryClient = useQueryClient()
     const { data, isLoading: isFrndsLoading, isSuccess: isFrndsSuccess } = useQuery({
         queryKey: ["userFriends"],
         queryFn: async (): Promise<{ friends: Friend[] }> => {
@@ -31,6 +34,36 @@ const ChatList: FC<ChatListProps> = ({ }) => {
             return res.data
         },
     })
+
+    useEffect(() => {
+        const incomingFrndReqHandler = (_newfrnd: Friend) => {
+            queryClient.invalidateQueries({ queryKey: ["userFriends"] });
+        }
+        socket.on(NEW_FRIEND, incomingFrndReqHandler)
+        return (() => {
+            socket.off(NEW_FRIEND, incomingFrndReqHandler)
+        })
+    }, [])
+
+    useEffect(() => {
+        const incomingAddedInGrpHandler = () => {
+            queryClient.invalidateQueries({ queryKey: ["userGroups"] });
+        }
+        socket.on(ADDED_IN_GROUP, incomingAddedInGrpHandler)
+        return (() => {
+            socket.off(ADDED_IN_GROUP, incomingAddedInGrpHandler)
+        })
+    }, [])
+
+    useEffect(() => {
+        const incomingRemovedFromGrpHandler = () => {
+            queryClient.invalidateQueries({ queryKey: ["userGroups"] });
+        }
+        socket.on(REMOVED_FROM_GROUP, incomingRemovedFromGrpHandler)
+        return (() => {
+            socket.off(REMOVED_FROM_GROUP, incomingRemovedFromGrpHandler)
+        })
+    }, [])
 
     return (
         <div className='w-[280px] h-full bg-light-bg dark:bg-dark-bg font-nunito'>

@@ -79,7 +79,7 @@ const Sidebar: FC<SidebarProps> = ({ }) => {
                         :
                         <Popover>
                             <PopoverTrigger >
-                                <Avatar username={data?.user.username!} />
+                                <Avatar className='cursor-pointer' username={data?.user.username!} />
                             </PopoverTrigger>
                             <PopoverContent className='py-2 px-3 w-fit font-medium'>
                                 <div>

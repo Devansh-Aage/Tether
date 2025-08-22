@@ -1,4 +1,3 @@
-
 import { Navigate, Route, Routes } from 'react-router'
 import './App.css'
 import Login from './page/auth/Login'

@@ -6,7 +6,6 @@ import { Check, X } from 'lucide-react'
 import socket from '@/lib/socket'
 import { ACCEPT_FRIEND_REQ, DENY_FRIEND_REQ } from '@tether/common/src/eventConstants'
 import { useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 
 interface FriendReqCardProps {
     friendReq: FriendRequest
@@ -35,7 +34,7 @@ const FriendReqCard: FC<FriendReqCardProps> = ({ friendReq }) => {
     }
 
     return (
-        <div className='border border-foreground/30 px-3 py-2 flex items-center gap-3 rounded-lg shadow'>
+        <div key={friendReq.id} className='border border-foreground/30 px-3 py-2 flex items-center gap-3 rounded-lg shadow'>
             {
                 friendReq.senderImg ?
                     <div>

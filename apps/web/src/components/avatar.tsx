@@ -11,7 +11,7 @@ const Avatar: FC<AvatarProps> = ({ username, imgLink, className }) => {
     if (username) {
         return (
             <div className={cn(
-                "cursor-pointer bg-pink-900 rounded-full flex items-center justify-center text-white text-lg ",
+                "  bg-pink-900 rounded-full flex items-center justify-center text-white text-lg ",
                 "size-10",
                 className
             )}>{username.charAt(0)}</div>
@@ -20,7 +20,7 @@ const Avatar: FC<AvatarProps> = ({ username, imgLink, className }) => {
     if (imgLink) {
         return (
             <div className={cn(
-                "cursor-pointer  rounded-full flex items-center justify-center ",
+                "   rounded-full flex items-center justify-center ",
                 "size-10",
                 className
             )}>

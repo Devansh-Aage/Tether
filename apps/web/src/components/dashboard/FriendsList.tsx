@@ -1,11 +1,8 @@
-import { useEffect, useState, type FC } from 'react'
+import { useState, type FC } from 'react'
 import FriendCard from './FriendCard'
 import { useAuth } from '@/context/AuthContext'
-import { useQueryClient } from '@tanstack/react-query';
 import { Skeleton } from '../ui/skeleton';
 import type { Friend } from '@tether/db/src/types';
-import socket from '@/lib/socket';
-import { NEW_FRIEND } from '@tether/common/src/eventConstants';
 import { cn } from '@/lib/utils';
 
 
@@ -15,24 +12,13 @@ interface FriendsListProps {
 }
 
 const FriendsList: FC<FriendsListProps> = ({ friends, isLoading }) => {
-    const queryClient = useQueryClient()
     const { isAuthLoading } = useAuth();
     const [input, setInput] = useState("")
-
-    useEffect(() => {
-        const incomingFrndReqHandler = (_newfrnd: Friend) => {
-            queryClient.invalidateQueries({ queryKey: ["userFriends"] });
-        }
-        socket.on(NEW_FRIEND, incomingFrndReqHandler)
-        return (() => {
-            socket.off(NEW_FRIEND, incomingFrndReqHandler)
-        })
-    }, [])
 
     const filteredChats = friends?.filter((friend) =>
         friend.username.toLowerCase().includes(input.toLowerCase())
     );
-    
+
     return (
         <div className='w-full'>
             <input value={input} onChange={(e) => setInput(e.target.value)} type="text" placeholder='Search' className={cn(

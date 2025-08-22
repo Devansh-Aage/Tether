@@ -47,3 +47,38 @@ export const addMilestone = z.object({
     invalid_type_error: "Invalid date format",
   }),
 });
+
+export const createContest = z.object({
+  title: z
+    .string()
+    .min(3, "The title must be at least 2 characters long")
+    .max(52, "Contest title too long!"),
+  description: z
+    .string()
+    .min(10, "The description must be at least 10 characters long")
+    .max(200, "Contest description too long!"),
+  startTime: z.coerce.date({
+    required_error: "Please enter a valid date",
+    invalid_type_error: "Invalid date format",
+  }),
+  endTime: z.coerce.date({
+    required_error: "Please enter a valid date",
+    invalid_type_error: "Invalid date format",
+  }),
+  groupId: z.string().uuid("Invalid ID"),
+});
+
+export const createContestMembership = z.object({
+  stake: z.coerce
+    .number({
+      required_error: "Please enter a valid amount in number",
+      invalid_type_error: "Invalid number format",
+    })
+    .gt(0, "Stake amount must be greater than 0"),
+  contestId: z.string().uuid("Invalid contest ID"),
+});
+
+export const addContestVote = z.object({
+  contestId: z.string().uuid("Invalid contest ID"),
+  contestMemberId: z.string().uuid("Invalid contest member ID"),
+});

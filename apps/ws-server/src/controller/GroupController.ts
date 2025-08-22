@@ -9,8 +9,10 @@ import {
 } from "@tether/common/src/zodWsSchemas";
 import {
   ADD_IN_GROUP_RES,
+  ADDED_IN_GROUP,
   CREATE_GROUP_RES,
   REMOVE_FROM_GROUP_RES,
+  REMOVED_FROM_GROUP,
 } from "@tether/common/src/eventConstants";
 
 dotenv.config();
@@ -63,17 +65,20 @@ export const createGroup = async (socket: Socket, rawPayload: CreateGroup) => {
       },
     });
 
-    payload.memberIds.map(
-      async (memberId) =>
-        await prisma.groupMembership.createMany({
-          data: [
-            {
-              userId: memberId,
-              groupId: group.id,
-            },
-          ],
-        })
-    );
+    payload.memberIds.forEach(async (memberId) => {
+      await prisma.groupMembership.createMany({
+        data: [
+          {
+            userId: memberId,
+            groupId: group.id,
+            isAdmin: memberId === payload.creatorId ? true : false,
+          },
+        ],
+      });
+      socket
+        .to(`user:${memberId}`)
+        .emit(ADDED_IN_GROUP, "You are added to a group chat");
+    });
     socket.emit(CREATE_GROUP_RES, "Created group");
   } catch (error) {
     console.error("Error while creating group: ", error);
@@ -156,17 +161,20 @@ export const addMember = async (socket: Socket, rawPayload: AddInGroup) => {
       return;
     }
 
-    payload.memberIds.map(
-      async (memberId) =>
-        await prisma.groupMembership.createMany({
-          data: [
-            {
-              userId: memberId,
-              groupId: group.id,
-            },
-          ],
-        })
-    );
+    payload.memberIds.forEach(async (memberId) => {
+      await prisma.groupMembership.createMany({
+        data: [
+          {
+            userId: memberId,
+            groupId: group.id,
+          },
+        ],
+      });
+      socket
+        .to(`user:${memberId}`)
+        .emit(ADDED_IN_GROUP, "You are added to a group chat");
+    });
+
     socket.emit(ADD_IN_GROUP_RES, "Added in group");
   } catch (error) {
     console.error("Error while adding in group: ", error);
@@ -220,12 +228,20 @@ export const removeMember = async (
       return;
     }
 
+    await prisma.groupMessage.deleteMany({
+      where: {
+        senderId: payload.memberId,
+      },
+    });
+
     await prisma.groupMembership.delete({
       where: {
         id: isGroupMember.id,
       },
     });
-
+    socket
+      .to(`user:${payload.memberId}`)
+      .emit(REMOVED_FROM_GROUP, "You are added to a group chat");
     socket.emit(REMOVE_FROM_GROUP_RES, "Removed from group!");
   } catch (error) {
     console.error("Error while removing from group: ", error);

@@ -1,8 +1,7 @@
 import { useAuth } from '@/context/AuthContext'
 import { cn } from '@/lib/utils'
-import { useQueryClient } from '@tanstack/react-query'
 import type { Group } from '@tether/db/src/types'
-import { useState, type FC } from 'react'
+import {  useState, type FC } from 'react'
 import { Skeleton } from './ui/skeleton'
 import GroupCard from './dashboard/group/GroupCard'
 
@@ -12,9 +11,11 @@ interface GroupListProps {
 }
 
 const GroupList: FC<GroupListProps> = ({ groups, isLoading }) => {
-    const queryClient = useQueryClient()
+
     const { isAuthLoading } = useAuth();
     const [input, setInput] = useState("")
+
+ 
     const filteredChats = groups?.filter((group) =>
         group.name.toLowerCase().includes(input.toLowerCase())
     );

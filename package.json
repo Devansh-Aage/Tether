@@ -14,7 +14,9 @@
     "migrate": "pnpm --filter @tether/db migrate",
     "push": "pnpm --filter @tether/db push",
     "studio": "pnpm --filter @tether/db studio",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "turbo run dev",
+    "build": "turbo run build"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +27,7 @@
     "nodemon": "^3.1.10",
     "prisma": "^6.10.0",
     "ts-node": "^10.9.2",
+    "turbo": "^2.5.6",
     "typescript": "^5.8.3"
   },
   "dependencies": {

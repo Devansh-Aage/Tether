@@ -5,8 +5,9 @@ import {
   Milestone,
   Message,
   Group,
+  GroupMessage,
 } from "@prisma/client";
-export type { User, FriendReq, Task, Milestone, Message, Group };
+export type { User, FriendReq, Task, Milestone, Message, Group, GroupMessage };
 
 export interface Friend {
   id: string;
@@ -38,8 +39,51 @@ export interface FriendRequest {
   senderPubkey: string;
 }
 
-export interface ChatData {
+export interface ChatApiData {
   messages: Message[];
   friend: UserData;
   user: UserData;
+  nextCursor: string | null;
+}
+
+export interface GroupMetadata {
+  grpName: string;
+  grpImg: string;
+}
+
+export interface GroupMember extends UserData {
+  isAdmin: boolean;
+  isCreator: boolean;
+}
+
+export interface GroupData {
+  group: GroupMetadata;
+  members: GroupMember[];
+}
+
+export interface GroupChats {
+  messages: GroupMessage[];
+  nextCursor: string | null;
+}
+
+export type page = {
+  messages: GroupMessage[];
+  nextCursor: string | null;
+};
+
+export interface GroupMsgsData {
+  pageParams: string[] | undefined[];
+  pages: page[];
+}
+
+export type frndpage = {
+  messages: Message[];
+  friend: UserData;
+  user: UserData;
+  nextCursor: string | null;
+};
+
+export interface ChatData {
+  pageParams: string[] | undefined[];
+  pages: frndpage[];
 }

@@ -6,6 +6,7 @@ import { Pool } from "pg"; // For connect-pg-simple
 import AuthRouter from "./routes/authRoutes";
 import TaskRouter from "./routes/taskRoutes";
 import MilestoneRouter from "./routes/milestoneRoutes";
+import ContestRouter from "./routes/contestRoutes";
 import HelperRouter from "./routes/helperRoutes";
 import { appIsLoggedIn } from "./middleware/app-isLoggedIn";
 
@@ -56,6 +57,7 @@ app.use(
 app.use("/api/auth", AuthRouter);
 app.use("/api/task", TaskRouter);
 app.use("/api/milestone", MilestoneRouter);
+app.use("/api/contest", ContestRouter);
 app.use("/api/helper", HelperRouter);
 
 app.get("/api/app/auth", appIsLoggedIn);

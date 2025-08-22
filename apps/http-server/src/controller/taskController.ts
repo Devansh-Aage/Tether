@@ -18,10 +18,6 @@ export const createTask: RequestHandler = async (req, res) => {
     }
 
     const { title } = validation.data;
-    if (!title) {
-      res.status(400).json({ message: "Insufficient Payload Data!!" });
-      return;
-    }
 
     const userId = req.userId;
     if (!userId) {

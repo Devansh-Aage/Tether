@@ -21,10 +21,10 @@ enum AuthProvider {
 model User {
   id String @id @default(uuid()) @db.Uuid
   email String @unique
-  username String 
+  username String
   profileImg String?
   password String? @db.VarChar(255)
-  pubKey String?
+  pubKey String?  @unique
   googleId String?  //unique id given by google to each email
   authProvider AuthProvider
   createdAt DateTime @default(now())
@@ -50,8 +50,11 @@ model User {
   // between User and Group (adminship and membership).
   creatorOfGroups Group[] @relation("GroupCreator") 
 
+  memberOfContest ContestMembership[]
+
+  votes ContestVote[]
+
   winnerOfContest Contest[] @relation("ContestWinner") //One to many
-  membersOfContest Contest[] @relation("ContestMembers")
 
    // A user can be the "requestor" in many friendships
   friendshipsInitiated Friendship[] @relation("UserFriendA")
@@ -103,6 +106,8 @@ model Friendship {
   // For simplicity, we can enforce (A,B) unique and always store A < B
   // Or handle in application logic. For DB constraint, assuming userAId < userBId for canonical representation
   @@unique([userAId, userBId])
+  @@index([userAId])
+  @@index([userBId])
 }
 
 model Message{
@@ -122,6 +127,8 @@ model Message{
   sender User @relation("MessageSender",fields: [senderId],references: [id],onDelete: Cascade)
 
   receiver User @relation("MessageReceiver",fields: [receiverId],references: [id],onDelete: Cascade)
+
+  @@index([friendshipId, timestamp(sort: Desc)])
 }
 
 
@@ -146,7 +153,7 @@ model GroupMembership {
   groupId   String   @db.Uuid
   joinedAt  DateTime @default(now())
   isAdmin   Boolean  @default(false)
-
+//thinking of adding isCreator flag here
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
@@ -160,13 +167,22 @@ model GroupMessage{
   media String?
   timestamp DateTime @default(now())
 
-  isSent String[] @db.Uuid
-  isSeen String[] @db.Uuid
+  // isSent String[] @db.Uuid
+  // isSeen String[] @db.Uuid
 
   groupId String @db.Uuid
   group Group @relation(fields: [groupId],references: [id],onDelete: Cascade)
 
   sender User @relation("GroupMessageSender",fields: [senderId],references: [id],onDelete: Cascade)
+
+  @@index([groupId,timestamp(sort: Desc)])
+}
+
+enum ContestStatus{
+  UPCOMING
+  ONGOING
+  VOTING
+  COMPLETED
 }
 
 
@@ -176,15 +192,44 @@ model Contest{
   description String
   startTime DateTime
   endTime DateTime
-  totalStakeAmount Int @default(0)
   winnerId String? @db.Uuid //foreign key
   groupId String @db.Uuid //foreign key
-  
+  status ContestStatus @default(UPCOMING)
   group Group @relation(fields: [groupId], references: [id], onDelete: Cascade) //virtual table
 
   winner User? @relation("ContestWinner",fields: [winnerId], references: [id], onDelete: Cascade)
 
-  contestMembers User[] @relation("ContestMembers")
+  contestMemberships ContestMembership[]
+
+  votes ContestVote[]
+}
+
+model ContestMembership{
+  id String @id @default(uuid()) @db.Uuid
+  stake Int 
+  userId String @db.Uuid
+  contestId String @db.Uuid
+  isClaimed Boolean @default(false)
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  contest Contest @relation(fields: [contestId],references: [id],onDelete: Cascade)
+
+  votes ContestVote[]
+
+  @@unique([userId, contestId])
+}
+
+model ContestVote{
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  contestId String @db.Uuid
+  contestMemberId String @db.Uuid
+
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contest        Contest           @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  contestMember  ContestMembership @relation(fields: [contestMemberId], references: [id], onDelete: Cascade)
+  @@unique([userId, contestId])
 }
 
 
