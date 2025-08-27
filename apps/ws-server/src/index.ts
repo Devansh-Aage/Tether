@@ -28,11 +28,16 @@ io.use(isAuth);
 
 let activeSockets = 0;
 
-io.on("connection", async (socket: CustomSocket) => {
-  activeSockets += 1;
-  console.log("Active Connections: ", activeSockets);
+const userSockets = new Map<string, Set<CustomSocket>>();
 
-  socket.join(`user:${socket.data.userId}`);
+export function getSocketsForUser(userId: string): Set<CustomSocket> {
+  return userSockets.get(userId) ?? new Set();
+}
+
+io.on("connection", async (socket: CustomSocket) => {
+  const userId = socket.data.userId; // assume you attach this in middleware
+
+  socket.join(`user:${userId}`);
 
   const groupIds = await getGroupIds(socket);
   if (groupIds?.length > 0) {
@@ -40,6 +45,14 @@ io.on("connection", async (socket: CustomSocket) => {
       socket.join(`group:${groupId}`);
     });
   }
+
+  if (!userSockets.has(userId)) {
+    userSockets.set(userId, new Set());
+  }
+  userSockets.get(userId)!.add(socket);
+
+  activeSockets += 1;
+  console.log(`User ${userId} connected with socket ${socket.id}`);
 
   //Friend Req Routes
   friendRoutes(socket);
@@ -55,7 +68,11 @@ io.on("connection", async (socket: CustomSocket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Client disconnected:", socket.id);
+    userSockets.get(userId)?.delete(socket);
+    if (userSockets.get(userId)?.size === 0) {
+      userSockets.delete(userId);
+    }
+    console.log(`User ${userId} disconnected socket ${socket.id}`);
     activeSockets -= 1;
     console.log("Active Connections: ", activeSockets);
   });

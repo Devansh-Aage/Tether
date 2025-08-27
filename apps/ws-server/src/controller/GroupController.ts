@@ -14,6 +14,7 @@ import {
   REMOVE_FROM_GROUP_RES,
   REMOVED_FROM_GROUP,
 } from "@tether/common/src/eventConstants";
+import { getSocketsForUser } from "..";
 
 dotenv.config();
 
@@ -75,6 +76,10 @@ export const createGroup = async (socket: Socket, rawPayload: CreateGroup) => {
           },
         ],
       });
+      const memberSockets = getSocketsForUser(memberId);
+      for (const memberSocket of memberSockets) {
+        memberSocket.join(`group:${group.id}`);
+      }
       socket
         .to(`user:${memberId}`)
         .emit(ADDED_IN_GROUP, "You are added to a group chat");
@@ -173,6 +178,10 @@ export const addMember = async (socket: Socket, rawPayload: AddInGroup) => {
       socket
         .to(`user:${memberId}`)
         .emit(ADDED_IN_GROUP, "You are added to a group chat");
+      const memberSockets = getSocketsForUser(memberId);
+      for (const memberSocket of memberSockets) {
+        memberSocket.join(`group:${group.id}`);
+      }
     });
 
     socket.emit(ADD_IN_GROUP_RES, "Added in group");
@@ -242,6 +251,10 @@ export const removeMember = async (
     socket
       .to(`user:${payload.memberId}`)
       .emit(REMOVED_FROM_GROUP, "You are added to a group chat");
+    const memberSockets = getSocketsForUser(payload.memberId);
+    for (const memberSocket of memberSockets) {
+      memberSocket.leave(`group:${group.id}`);
+    }
     socket.emit(REMOVE_FROM_GROUP_RES, "Removed from group!");
   } catch (error) {
     console.error("Error while removing from group: ", error);

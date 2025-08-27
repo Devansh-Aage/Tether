@@ -57,7 +57,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({ group, members, isCreator, groupId 
         setTimeout(() => {
             queryClient.invalidateQueries({ queryKey: [groupId, "data"] });
             queryClient.invalidateQueries({ queryKey: ["friends", "addGroup"] });
-        }, 1000);
+        }, 500);
     }
 
     const removeMemberFromGroup = async (memberId: string) => {
@@ -102,12 +102,12 @@ const GroupHeader: FC<GroupHeaderProps> = ({ group, members, isCreator, groupId 
                                         <p>{member.username}</p>
                                         {
                                             member.isCreator &&
-                                            <Badge className='bg-action text-white' >Creator</Badge>
+                                            <Badge className='bg-blue-600 text-white' >Creator</Badge>
                                         }
-                                        {
+                                        {/* {
                                             member.isAdmin &&
                                             <Badge className='bg-blue-600 text-white' >Admin</Badge>
-                                        }
+                                        } */}
                                     </div>
                                     {
                                         isCreator &&

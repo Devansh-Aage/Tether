@@ -6,7 +6,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { SendHorizontal, Smile } from 'lucide-react'
 import { useEffect, useRef, useState, type FC, type FormEvent } from 'react'
 import EmojiPicker from 'emoji-picker-react';
-import type { GroupChats, GroupMessage, GroupMsgsData } from '@tether/db/src/types'
+import type { GroupMsgsData } from '@tether/db/src/types'
 import socket from '@/lib/socket'
 import { SEND_MSG_GRP_REQ } from '@tether/common/src/eventConstants'
 
