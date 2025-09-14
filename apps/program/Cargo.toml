@@ -7,4 +7,7 @@ edition = "2021"
 pinocchio = "0.9.1"
 pinocchio-associated-token-account = "0.2.0"
 pinocchio-system = "0.3.0"
-pinocchio-token = "0.4.0"
+pinocchio-token-2022 = "0.1.0"
+
+[lib]
+crate-type = ["lib", "cdylib"]
