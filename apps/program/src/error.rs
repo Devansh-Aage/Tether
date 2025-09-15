@@ -19,7 +19,7 @@ pub enum TetherError {
     // Claim Not Active Yet
     NotActive,
     // Insufficient Funds
-    InsufficientFunds
+    InsufficientFunds,
 }
 
 impl From<TetherError> for ProgramError {

@@ -1,5 +1,6 @@
 use core::mem::size_of;
 use pinocchio::{program_error::ProgramError, pubkey::Pubkey};
+use shank::ShankAccount;
 
 // #[repr(C)]
 // pub struct Admin {
@@ -34,6 +35,7 @@ use pinocchio::{program_error::ProgramError, pubkey::Pubkey};
 //     }
 // }
 
+#[derive(ShankAccount)]
 #[repr(C)]
 pub struct Participant {
     pub stake: u64,
@@ -42,9 +44,10 @@ pub struct Participant {
     pub participant: Pubkey,
     pub bump: [u8; 1],
 }
+
 impl Participant {
     pub const LEN: usize = size_of::<u64>()
-    + size_of::<i64>()
+        + size_of::<i64>()
         + size_of::<u64>()
         + size_of::<Pubkey>()
         + size_of::<[u8; 1]>();

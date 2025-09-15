@@ -14,6 +14,7 @@ pub struct ClaimAccounts<'a> {
     pub participant: &'a AccountInfo,
     pub participant_ata: &'a AccountInfo,
     pub mint: &'a AccountInfo,
+    pub mint_auth: &'a AccountInfo,
     pub token_program: &'a AccountInfo,
     pub system_program: &'a AccountInfo,
 }
@@ -21,7 +22,8 @@ pub struct ClaimAccounts<'a> {
 impl<'a> TryFrom<&'a [AccountInfo]> for ClaimAccounts<'a> {
     type Error = ProgramError;
     fn try_from(accounts: &'a [AccountInfo]) -> Result<Self, Self::Error> {
-        let [signer, participant, participant_ata, mint, token_program, system_program] = accounts
+        let [signer, participant, participant_ata, mint, mint_auth, token_program, system_program] =
+            accounts
         else {
             return Err(ProgramError::NotEnoughAccountKeys);
         };
@@ -30,12 +32,14 @@ impl<'a> TryFrom<&'a [AccountInfo]> for ClaimAccounts<'a> {
         ParticipantAccount::check(participant)?;
         AssociatedTokenAccount::check(participant_ata, signer, mint, token_program)?;
         MintAccount::check(mint)?;
+        ProgramAccount::check(mint_auth)?;
 
         Ok(Self {
             signer,
             participant,
             participant_ata,
             mint,
+            mint_auth,
             token_program,
             system_program,
         })
@@ -122,7 +126,7 @@ impl<'a> Claim<'a> {
 
         let bump_binding = [self.instruction_data.mint_bump];
         let mint_seeds = [
-            Seed::from(b"mint"),
+            Seed::from(b"mint_auth"),
             Seed::from(self.accounts.mint.key().as_ref()),
             Seed::from(&bump_binding),
         ];
@@ -132,9 +136,9 @@ impl<'a> Claim<'a> {
         MintToChecked {
             account: self.accounts.participant_ata,
             mint: self.accounts.mint,
-            mint_authority: self.accounts.mint,
+            mint_authority: self.accounts.mint_auth,
             amount,
-            decimals: 6,
+            decimals: 9,
             token_program: self.accounts.token_program.key(),
         }
         .invoke_signed(&[mint_signer])?;

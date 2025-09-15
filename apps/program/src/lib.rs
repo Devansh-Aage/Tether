@@ -12,8 +12,10 @@ pub use state::*;
 pub mod error;
 pub use error::*;
 
+pub mod processor;
+pub use processor::*;
+
 pub mod instructions;
-pub use instructions::*;
 
 // 22222222222222222222222222222222222222222222
 pub const ID: Pubkey = [

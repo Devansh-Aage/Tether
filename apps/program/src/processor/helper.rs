@@ -45,6 +45,16 @@ pub trait ProgramAccountInit {
         space: usize,
     ) -> ProgramResult;
 }
+
+impl AccountCheck for ProgramAccount {
+    fn check(account: &AccountInfo) -> Result<(), ProgramError> {
+        if !account.is_owned_by(&crate::ID) {
+            return Err(ProgramError::InvalidAccountOwner);
+        }
+        Ok(())
+    }
+}
+
 impl ProgramAccountInit for ProgramAccount {
     fn init<'a, T: Sized>(
         account: &AccountInfo,
@@ -223,4 +233,3 @@ impl AssociatedTokenAccountInit for AssociatedTokenAccount {
         }
     }
 }
-

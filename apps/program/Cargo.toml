@@ -8,6 +8,11 @@ pinocchio = "0.9.1"
 pinocchio-associated-token-account = "0.2.0"
 pinocchio-system = "0.3.0"
 pinocchio-token-2022 = "0.1.0"
+shank = "0.4.5"
+
+[build-dependencies]
+shank-cli = "0.4.5"
+
 
 [lib]
 crate-type = ["lib", "cdylib"]
