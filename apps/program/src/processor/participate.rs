@@ -77,7 +77,7 @@ impl<'a> TryFrom<(&'a [u8], &'a [AccountInfo])> for Participate<'a> {
         let (_, bump) = find_program_address(
             &[
                 b"participant",
-                accounts.participant.key(),
+                accounts.signer.key(),
                 &instruction_data.seed.to_le_bytes(),
             ],
             &crate::ID,
@@ -87,7 +87,7 @@ impl<'a> TryFrom<(&'a [u8], &'a [AccountInfo])> for Participate<'a> {
         let bump_binding = [bump];
         let participant_seeds: [Seed<'_>; 4] = [
             Seed::from(b"participant"),
-            Seed::from(accounts.participant.key().as_ref()),
+            Seed::from(accounts.signer.key().as_ref()),
             Seed::from(&seed_binding),
             Seed::from(&bump_binding),
         ];
@@ -133,7 +133,7 @@ impl<'a> Participate<'a> {
             token_balance,
             self.instruction_data.active_time,
             self.instruction_data.seed,
-            *self.accounts.participant.key(),
+            *self.accounts.signer.key(),
             [self.bump],
         );
         Ok(())

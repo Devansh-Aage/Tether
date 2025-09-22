@@ -18,7 +18,7 @@ import {
 } from '../instructions';
 
 export const PROGRAM_PROGRAM_ADDRESS =
-  '0f1e6b1421c04a070431265c19c5bbee1992bae8afd1cd078ef8af7047dc11f7' as Address<'0f1e6b1421c04a070431265c19c5bbee1992bae8afd1cd078ef8af7047dc11f7'>;
+  '4gP1Egxwstd3rraRQgCaA7pN4ty7nSMrxDxaXfxYgsgs' as Address<'4gP1Egxwstd3rraRQgCaA7pN4ty7nSMrxDxaXfxYgsgs'>;
 
 export enum ProgramAccount {
   Participant,
@@ -45,8 +45,7 @@ export function identifyProgramInstruction(
 }
 
 export type ParsedProgramInstruction<
-  TProgram extends
-    string = '0f1e6b1421c04a070431265c19c5bbee1992bae8afd1cd078ef8af7047dc11f7',
+  TProgram extends string = '4gP1Egxwstd3rraRQgCaA7pN4ty7nSMrxDxaXfxYgsgs',
 > =
   | ({
       instructionType: ProgramInstruction.Participate;
